@@ -6,10 +6,10 @@ public class ChessController : MonoBehaviour
     [Header("기물 잔상 참조")]
     [SerializeField] GameObject pawnPoint;
     [SerializeField] GameObject knightPoint;
-    //[SerializeField] GameObject bishopPoint;
-    //[SerializeField] GameObject rookPoint;
-    //[SerializeField] GameObject queenPoint;
-    //[SerializeField] GameObject KingPoinit;
+    [SerializeField] GameObject bishopPoint;
+    [SerializeField] GameObject rookPoint;
+    [SerializeField] GameObject queenPoint;
+    [SerializeField] GameObject kingPoint;
 
     GameObject[] piecePoints;
     GameObject choicePiece;
@@ -21,12 +21,16 @@ public class ChessController : MonoBehaviour
         pieceLayerMask = LayerMask.GetMask("Piece");
         boardLayerMask = LayerMask.GetMask("Board");
 
-        piecePoints = new GameObject[2];
+        piecePoints = new GameObject[(int)PieceType.Size];
         piecePoints[(int)PieceType.Pawn] = pawnPoint;
         piecePoints[(int)PieceType.Knight] = knightPoint;
-
-        foreach(GameObject point in piecePoints)
+        piecePoints[(int)PieceType.Bishop]= bishopPoint;
+        piecePoints[(int)PieceType.Rook] = rookPoint;
+        piecePoints[(int)PieceType.Queen] = queenPoint;
+        piecePoints[(int)PieceType.King] = kingPoint;
+        foreach (GameObject point in piecePoints)
         {
+            Debug.Log(point.name);
             point.gameObject.SetActive(false);
         }
     }
@@ -47,12 +51,10 @@ public class ChessController : MonoBehaviour
 
     void ChoosePiece()
     {
-        Debug.Log("터치");
         Vector3 touchPos = Input.touches[0].position;
         Ray ray = Camera.main.ScreenPointToRay(touchPos);
         if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 10f, pieceLayerMask))
         {
-            Debug.Log("선택");
             choicePiece = hit.collider.gameObject;
             Piece piece = choicePiece.GetComponent<Piece>();
             choicePiecePoint = piecePoints[(int)piece.data.type];
@@ -63,7 +65,6 @@ public class ChessController : MonoBehaviour
     }
     void UnChoosePiece()
     {
-        Debug.Log("터치해제");
         if (movePieceRoutine != null)
         {
             StopCoroutine(movePieceRoutine);
@@ -86,7 +87,6 @@ public class ChessController : MonoBehaviour
         {
             if (Input.touchCount > 0)
             {
-                Debug.Log("이동");
                 Vector3 touchPos = Input.touches[0].position;
                 Ray ray = Camera.main.ScreenPointToRay(touchPos);
                 if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 10f, boardLayerMask))
