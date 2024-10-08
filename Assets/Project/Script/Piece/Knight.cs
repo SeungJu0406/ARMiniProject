@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Piece : MonoBehaviour
+public class Knight : Piece
 {
-    [SerializeField] public PieceData data;
+    
 }
