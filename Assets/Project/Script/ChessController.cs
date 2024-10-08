@@ -3,9 +3,17 @@ using UnityEngine;
 
 public class ChessController : MonoBehaviour
 {
-    [SerializeField] GameObject pawnPosPrefab;
-    GameObject pawnPosInstance;
+    [Header("기물 잔상 참조")]
+    [SerializeField] GameObject pawnPoint;
+    [SerializeField] GameObject knightPoint;
+    //[SerializeField] GameObject bishopPoint;
+    //[SerializeField] GameObject rookPoint;
+    //[SerializeField] GameObject queenPoint;
+    //[SerializeField] GameObject KingPoinit;
+
+    GameObject[] piecePoints;
     GameObject choicePiece;
+    GameObject choicePiecePoint;
     int pieceLayerMask;
     int boardLayerMask;
     private void Awake()
@@ -13,8 +21,14 @@ public class ChessController : MonoBehaviour
         pieceLayerMask = LayerMask.GetMask("Piece");
         boardLayerMask = LayerMask.GetMask("Board");
 
-        pawnPosInstance = Instantiate(pawnPosPrefab);
-        pawnPosInstance.SetActive(false);
+        piecePoints = new GameObject[2];
+        piecePoints[(int)PieceType.Pawn] = pawnPoint;
+        piecePoints[(int)PieceType.Knight] = knightPoint;
+
+        foreach(GameObject point in piecePoints)
+        {
+            point.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
@@ -40,6 +54,9 @@ public class ChessController : MonoBehaviour
         {
             Debug.Log("선택");
             choicePiece = hit.collider.gameObject;
+            Piece piece = choicePiece.GetComponent<Piece>();
+            choicePiecePoint = piecePoints[(int)piece.data.type];
+            
             movePieceRoutine = movePieceRoutine == null ? StartCoroutine(MovePieceRoutine()) : movePieceRoutine;
         }
 
@@ -55,8 +72,8 @@ public class ChessController : MonoBehaviour
 
         if (choicePiece != null)
         {
-            choicePiece.transform.position = pawnPosInstance.transform.position;
-            pawnPosInstance.SetActive(false);
+            choicePiece.transform.position = choicePiecePoint.transform.position;
+            choicePiecePoint.SetActive(false);
             choicePiece = null;
         }
 
@@ -64,7 +81,7 @@ public class ChessController : MonoBehaviour
     Coroutine movePieceRoutine;
     IEnumerator MovePieceRoutine()
     {
-        pawnPosInstance.SetActive(true);
+        choicePiecePoint.SetActive(true);
         while (true)
         {
             if (Input.touchCount > 0)
@@ -75,7 +92,7 @@ public class ChessController : MonoBehaviour
                 if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 10f, boardLayerMask))
                 {
                     Vector3 intPos = new Vector3((int)hit.point.x, (int)hit.point.y, (int)hit.point.z);
-                    pawnPosInstance.transform.position = intPos;
+                    choicePiecePoint.transform.position = intPos;
                 }
             }
             yield return Manager.Delay.ms05;
