@@ -36,6 +36,7 @@ public class AbleZonePool : MonoBehaviour
         else
         {
             GameObject instance = Instantiate(prefab);
+            instance.transform.SetParent(transform);
             instance.transform.position= pos;
             return instance;
         }

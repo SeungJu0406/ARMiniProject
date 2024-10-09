@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class ChessController : MonoBehaviour
@@ -7,27 +6,27 @@ public class ChessController : MonoBehaviour
     [System.Serializable]
     public struct Point
     {
-        [SerializeField]public GameObject pawnPoint;
-        [SerializeField]public GameObject knightPoint;
-        [SerializeField]public GameObject bishopPoint;
-        [SerializeField]public GameObject rookPoint;
-        [SerializeField]public GameObject queenPoint;
-        [SerializeField]public GameObject kingPoint;
+        [SerializeField] public GameObject pawnPoint;
+        [SerializeField] public GameObject knightPoint;
+        [SerializeField] public GameObject bishopPoint;
+        [SerializeField] public GameObject rookPoint;
+        [SerializeField] public GameObject queenPoint;
+        [SerializeField] public GameObject kingPoint;
     }
     [SerializeField] Point point;
 
     [System.Serializable]
     public struct PiecePoint
     {
-       public GameObject piecePoint;
-       public Material pointMaterial;
+        public GameObject piecePoint;
+        public Material pointMaterial;
     }
     PiecePoint[] piecePoints;
 
     Piece choicePiece;
     PiecePoint choicePiecePoint;
 
-    Team curTeam = Team.Black;
+    [SerializeField] Team curTeam = Team.White;
 
     int pieceLayerMask;
     int boardLayerMask;
@@ -102,7 +101,7 @@ public class ChessController : MonoBehaviour
                 // 해당 위치에 상대 기물이 있다면 상대 기물을 제거
                 if (ChessBoard.Instance.CheckTileOnBoard(pointPos, out PieceStruct enemyPiece))
                 {
-                    if(enemyPiece.team != Team.Null && enemyPiece.team != choicePiece.team)
+                    if (enemyPiece.team != Team.Null && enemyPiece.team != choicePiece.team)
                     {
                         Destroy(enemyPiece.piece.gameObject);
                     }
@@ -117,13 +116,12 @@ public class ChessController : MonoBehaviour
                 choicePiece.isMove = true;
 
                 // 턴 넘기기
-                if(choicePiece.team == Team.Black)
+                if (choicePiece.team == Team.Black)
                     curTeam = Team.White;
                 else if (choicePiece.team == Team.White)
                     curTeam = Team.Black;
             }
 
-            ChessBoard.Instance.DebugBoard();
             choicePiece.RemoveAbleTile();
             choicePiecePoint.piecePoint.SetActive(false);
             choicePiece = null;
@@ -146,7 +144,7 @@ public class ChessController : MonoBehaviour
             {
                 Vector3 intPos = new Vector3((int)hit.point.x, (int)hit.point.y, (int)hit.point.z);
                 BoardPos boardPos = ChessBoard.Instance.TransWorldToTile(intPos);
-                if (choicePiece.CheckAbleTile(boardPos)) 
+                if (choicePiece.CheckAbleTile(boardPos))
                 {
                     Color color = Color.cyan;
                     color.a = 0.3f;
@@ -169,33 +167,23 @@ public class ChessController : MonoBehaviour
     private void InitPoint()
     {
         piecePoints = new PiecePoint[(int)PieceType.Size];
-        piecePoints[(int)PieceType.Pawn] = new PiecePoint();
-        piecePoints[(int)PieceType.Pawn].piecePoint = point.pawnPoint;
-        piecePoints[(int)PieceType.Pawn].pointMaterial = piecePoints[(int)PieceType.Pawn].piecePoint.GetComponentInChildren<MeshRenderer>().material;
-
-        piecePoints[(int)PieceType.Knight] = new PiecePoint();
-        piecePoints[(int)PieceType.Knight].piecePoint = point.knightPoint;
-        piecePoints[(int)PieceType.Knight].pointMaterial = piecePoints[(int)PieceType.Knight].piecePoint.GetComponentInChildren<MeshRenderer>().material;
-
-        piecePoints[(int)PieceType.Bishop] = new PiecePoint();
-        piecePoints[(int)PieceType.Bishop].piecePoint = point.bishopPoint;
-        piecePoints[(int)PieceType.Bishop].pointMaterial = piecePoints[(int)PieceType.Bishop].piecePoint.GetComponentInChildren<MeshRenderer>().material;
-
-        piecePoints[(int)PieceType.Rook] = new PiecePoint();
-        piecePoints[(int)PieceType.Rook].piecePoint = point.rookPoint;
-        piecePoints[(int)PieceType.Rook].pointMaterial = piecePoints[(int)PieceType.Rook].piecePoint.GetComponentInChildren<MeshRenderer>().material;
-
-        piecePoints[(int)PieceType.Queen] = new PiecePoint();
-        piecePoints[(int)PieceType.Queen].piecePoint = point.queenPoint;
-        piecePoints[(int)PieceType.Queen].pointMaterial = piecePoints[(int)PieceType.Queen].piecePoint.GetComponentInChildren<MeshRenderer>().material;
-
-        piecePoints[(int)PieceType.King] = new PiecePoint();
-        piecePoints[(int)PieceType.King].piecePoint = point.kingPoint;
-        piecePoints[(int)PieceType.King].pointMaterial = piecePoints[(int)PieceType.King].piecePoint.GetComponentInChildren<MeshRenderer>().material;
+        SetPoint(PieceType.Pawn, point.pawnPoint);
+        SetPoint(PieceType.Knight, point.knightPoint);
+        SetPoint(PieceType.Bishop, point.bishopPoint);
+        SetPoint(PieceType.Rook, point.rookPoint);
+        SetPoint(PieceType.Queen, point.queenPoint);
+        SetPoint(PieceType.King, point.kingPoint);
 
         foreach (PiecePoint point in piecePoints)
         {
             point.piecePoint.SetActive(false);
         }
+    }
+
+    void SetPoint(PieceType type, GameObject point)
+    {
+        piecePoints[(int)type] = new PiecePoint();
+        piecePoints[(int)type].piecePoint = point;
+        piecePoints[(int)type].pointMaterial = piecePoints[(int)type].piecePoint.GetComponentInChildren<MeshRenderer>().material;
     }
 }
