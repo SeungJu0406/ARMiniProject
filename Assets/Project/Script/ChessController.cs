@@ -27,6 +27,8 @@ public class ChessController : MonoBehaviour
     Piece choicePiece;
     PiecePoint choicePiecePoint;
 
+    Team curTeam = Team.Black;
+
     int pieceLayerMask;
     int boardLayerMask;
     private void Awake()
@@ -70,10 +72,17 @@ public class ChessController : MonoBehaviour
         if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 10f, pieceLayerMask))
         {
             choicePiece = hit.collider.GetComponent<Piece>();
-            choicePiecePoint = piecePoints[(int)choicePiece.data.type];
-            choicePiece.CreateAbleTile();
+            if (choicePiece.team == curTeam)
+            {
+                choicePiecePoint = piecePoints[(int)choicePiece.data.type];
+                choicePiece.CreateAbleTile();
 
-            movePieceRoutine = movePieceRoutine == null ? StartCoroutine(MovePieceRoutine()) : movePieceRoutine;
+                movePieceRoutine = movePieceRoutine == null ? StartCoroutine(MovePieceRoutine()) : movePieceRoutine;
+            }
+            else
+            {
+                choicePiece = null;
+            }
         }
 
     }
@@ -90,11 +99,28 @@ public class ChessController : MonoBehaviour
             BoardPos pointPos = ChessBoard.Instance.TransWorldToTile(choicePiecePoint.piecePoint.transform.position);
             if (choicePiece.CheckAbleTile(pointPos))
             {
+                // 해당 위치에 상대 기물이 있다면 상대 기물을 제거
+                if (ChessBoard.Instance.CheckTileOnBoard(pointPos, out PieceStruct enemyPiece))
+                {
+                    if(enemyPiece.team != Team.Null && enemyPiece.team != choicePiece.team)
+                    {
+                        Destroy(enemyPiece.piece.gameObject);
+                    }
+                }
+
                 // 기존 위치 제거
                 ChessBoard.Instance.UnPlacePiece(ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
                 // 새로운 위치 등록
                 choicePiece.transform.position = choicePiecePoint.piecePoint.transform.position;
-                ChessBoard.Instance.PlacePiece(choicePiece.data.type, ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
+                PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece, choicePiece.team);
+                ChessBoard.Instance.PlacePiece(piece, ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
+                choicePiece.isMove = true;
+
+                // 턴 넘기기
+                if(choicePiece.team == Team.Black)
+                    curTeam = Team.White;
+                else if (choicePiece.team == Team.White)
+                    curTeam = Team.Black;
             }
 
             ChessBoard.Instance.DebugBoard();
