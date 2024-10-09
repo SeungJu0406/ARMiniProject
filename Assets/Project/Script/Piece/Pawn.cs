@@ -45,6 +45,8 @@ public class Pawn : Piece
                         if (!ProcessAbleTile(movePos))
                             continue;
                     }
+                    else
+                        break;
                 }
             }
             // 대각선 이동의 경우 해당 위치에 적이 있을 때만 움직일 수 있다
