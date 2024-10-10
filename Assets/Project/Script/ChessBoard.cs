@@ -16,7 +16,7 @@ public struct PieceStruct
 public struct AttackTile
 {
     public LinkedList<Piece> ables;
-    public LinkedList<Piece> attacks;
+    public LinkedList<Piece> warnings;
 }
 
 
@@ -41,11 +41,11 @@ public class ChessBoard : MonoBehaviour
             {
                 AttackTile black = new AttackTile();
                 black.ables = new LinkedList<Piece>();
-                black.attacks = new LinkedList<Piece>();
+                black.warnings = new LinkedList<Piece>();
                 blackAttackTiles[y,x] = black;
                 AttackTile white = new AttackTile();
                 white.ables = new LinkedList<Piece>();
-                white.attacks = new LinkedList<Piece>();
+                white.warnings = new LinkedList<Piece>();
                 whiteAttackTiles[y, x] = white;
             }
         }
@@ -112,7 +112,7 @@ public class ChessBoard : MonoBehaviour
         return false;
     }
 
-    public void AddAbleTiles(PieceStruct piece, BoardPos boardPos)
+    public void AddAbleTile(PieceStruct piece, BoardPos boardPos)
     {
         if(piece.team == Team.Black)
         {
@@ -123,6 +123,17 @@ public class ChessBoard : MonoBehaviour
             whiteAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
         }
     }
+    public void AddWarningTile(PieceStruct piece, BoardPos boardPos)
+    {
+        if (piece.team == Team.Black)
+        {
+            blackAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
+        }
+        else if (piece.team == Team.White)
+        {
+            whiteAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
+        }
+    }
 
     public void InitAttackTile()
     {
@@ -131,9 +142,9 @@ public class ChessBoard : MonoBehaviour
             for (int x = 0; x < blackAttackTiles.GetLength(1); x++)
             {
                 blackAttackTiles[y, x].ables.Clear();
-                blackAttackTiles[y, x].attacks.Clear();
+                blackAttackTiles[y, x].warnings.Clear();
                 whiteAttackTiles[y, x].ables.Clear();
-                whiteAttackTiles[y, x].attacks.Clear();
+                whiteAttackTiles[y, x].warnings.Clear();
             }
         }
         foreach(Piece piece in pieces)

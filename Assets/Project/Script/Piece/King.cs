@@ -18,6 +18,28 @@ public class King : Piece
         dirs[7] = new Vector3(1, 0, -1);    // 우하
     }
 
+    private void Update()
+    {
+        BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
+        if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].ables.Count > 0)
+        {
+            Debug.Log($"{piece.team}킹 체크!");
+        }
+        else if(ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].warnings.Count > 0)
+        {
+            Debug.Log($"{piece.team}킹 체크 위험");
+        }
+        if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].ables.Count > 0)
+        {
+            Debug.Log($"{piece.team}킹 체크!");
+        }
+        else if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].warnings.Count > 0)
+        {
+            Debug.Log($"{piece.team}킹 체크 위험");
+        }
+    }
+
+
 
     public override void AddAbleTile()
     {
