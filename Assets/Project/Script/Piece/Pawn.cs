@@ -3,7 +3,7 @@ using UnityEngine;
 public class Pawn : Piece
 {
     Vector3[] dirs = new Vector3[3];
-    public override void CreateAbleTile()
+    public override void AddAbleTile()
     {
         // 1. 현재 위치를 보드 위치로 변환
         BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position);

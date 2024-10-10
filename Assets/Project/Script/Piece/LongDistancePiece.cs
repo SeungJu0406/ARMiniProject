@@ -1,6 +1,6 @@
 public abstract class LongDistancePiece : Piece
 {
-    public override void CreateAbleTile() { }
+    public override void AddAbleTile() { }
 
     protected bool CheckAttackKing(BoardPos boardPos,out PieceStruct otherPiece)
     {

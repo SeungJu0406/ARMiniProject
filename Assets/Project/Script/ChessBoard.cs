@@ -37,7 +37,7 @@ public class ChessBoard : MonoBehaviour
         else Destroy(gameObject);
         for(int y = 0; y <blackAttackTiles. GetLength(0); y++)
         {
-            for(int x = 0; x < blackAttackTiles.GetLength(1); y++)
+            for(int x = 0; x < blackAttackTiles.GetLength(1); x++)
             {
                 AttackTile black = new AttackTile();
                 black.ables = new LinkedList<Piece>();
@@ -128,7 +128,7 @@ public class ChessBoard : MonoBehaviour
     {
         for (int y = 0; y < blackAttackTiles.GetLength(0); y++)
         {
-            for (int x = 0; x < blackAttackTiles.GetLength(1); y++)
+            for (int x = 0; x < blackAttackTiles.GetLength(1); x++)
             {
                 blackAttackTiles[y, x].ables.Clear();
                 blackAttackTiles[y, x].attacks.Clear();
@@ -138,7 +138,7 @@ public class ChessBoard : MonoBehaviour
         }
         foreach(Piece piece in pieces)
         {
-            
+            piece.AddAbleTile();
         }
     }
 

@@ -38,6 +38,10 @@ public class ChessController : MonoBehaviour
         InitPoint();
     }
 
+    private void Start()
+    {
+        ChessBoard.Instance.InitAttackTile();
+    }
     private void Update()
     {
 #if UNITY_EDITOR
@@ -103,12 +107,14 @@ public class ChessController : MonoBehaviour
                 {
                     if (enemyPiece.team != Team.Null && enemyPiece.team != choicePiece.team)
                     {
-                        Destroy(enemyPiece.piece.gameObject);
+                        enemyPiece.piece.Die();
                     }
                 }
 
                 // 기존 위치 제거
                 ChessBoard.Instance.UnPlacePiece(ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
+                choicePiece.RemoveAbleTile();
+                choicePiece.ClearAbleTiel();
                 // 새로운 위치 등록
                 choicePiece.transform.position = choicePiecePoint.piecePoint.transform.position;
                 PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece, choicePiece.team);
@@ -116,13 +122,18 @@ public class ChessController : MonoBehaviour
                 choicePiece.isMove = true;
 
                 // 턴 넘기기
+                ChessBoard.Instance.InitAttackTile();
+
                 if (choicePiece.team == Team.Black)
                     curTeam = Team.White;
                 else if (choicePiece.team == Team.White)
                     curTeam = Team.Black;
             }
-
-            choicePiece.RemoveAbleTile();
+            else
+            {
+                choicePiece.RemoveAbleTile();
+            }
+            
             choicePiecePoint.piecePoint.SetActive(false);
             choicePiece = null;
         }

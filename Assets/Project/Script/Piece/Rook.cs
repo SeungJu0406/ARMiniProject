@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rook : Piece
+public class Rook : LongDistancePiece
 { 
 
-    public override void CreateAbleTile()
+    public override void AddAbleTile()
     {
         // 1. 현재 위치를 보드 위치로 변환
         BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position);
