@@ -16,9 +16,12 @@ public abstract class Piece : MonoBehaviour
 
     private void Start()
     {
+        ChessBoard.Instance.pieces.Add(this);
+
         BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
         PieceStruct piece = ChessBoard.GetPieceStruct(this, team);
         ChessBoard.Instance.PlacePiece(piece, pos);
+       
     }
 
     public abstract void CreateAbleTile();

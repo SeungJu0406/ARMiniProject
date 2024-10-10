@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -12,19 +13,43 @@ public struct PieceStruct
     public PieceType type;
     public Team team;
 }
+public struct AttackTile
+{
+    public LinkedList<Piece> ables;
+    public LinkedList<Piece> attacks;
+}
+
 
 public class ChessBoard : MonoBehaviour
 {
     public static ChessBoard Instance;
 
-    public PieceStruct[,] board;
+    public List<Piece> pieces = new List<Piece>(32);
+
+    public PieceStruct[,] board= new PieceStruct[8, 8];
+
+    public AttackTile[,] blackAttackTiles = new AttackTile[8, 8];
+    public AttackTile[,] whiteAttackTiles = new AttackTile[8, 8];
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-
-        board = new PieceStruct[8, 8];
+        for(int y = 0; y <blackAttackTiles. GetLength(0); y++)
+        {
+            for(int x = 0; x < blackAttackTiles.GetLength(1); y++)
+            {
+                AttackTile black = new AttackTile();
+                black.ables = new LinkedList<Piece>();
+                black.attacks = new LinkedList<Piece>();
+                blackAttackTiles[y,x] = black;
+                AttackTile white = new AttackTile();
+                white.ables = new LinkedList<Piece>();
+                white.attacks = new LinkedList<Piece>();
+                whiteAttackTiles[y, x] = white;
+            }
+        }
+        
 
         for (int y = 0; y < board.GetLength(0); y++)
         {
@@ -86,6 +111,40 @@ public class ChessBoard : MonoBehaviour
         }
         return false;
     }
+
+    public void AddAbleTiles(PieceStruct piece, BoardPos boardPos)
+    {
+        if(piece.team == Team.Black)
+        {
+            blackAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
+        }
+        else if (piece.team == Team.White)
+        {
+            whiteAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
+        }
+    }
+
+    public void InitAttackTile()
+    {
+        for (int y = 0; y < blackAttackTiles.GetLength(0); y++)
+        {
+            for (int x = 0; x < blackAttackTiles.GetLength(1); y++)
+            {
+                blackAttackTiles[y, x].ables.Clear();
+                blackAttackTiles[y, x].attacks.Clear();
+                whiteAttackTiles[y, x].ables.Clear();
+                whiteAttackTiles[y, x].attacks.Clear();
+            }
+        }
+        foreach(Piece piece in pieces)
+        {
+            
+        }
+    }
+
+
+
+
     public void DebugBoard()
     {
         for (int i = board.GetLength(0) - 1; i >= 0; i--)
