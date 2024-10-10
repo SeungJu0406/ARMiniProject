@@ -484,7 +484,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &418944349
 Transform:
   m_ObjectHideFlags: 0
@@ -1227,7 +1227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1017435116
 Transform:
   m_ObjectHideFlags: 0
@@ -1288,15 +1288,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1047831027}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 9.28, z: -0.39}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 320559078}
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1001 &1135322147
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1521,6 +1521,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98616aaa8200784bb18a2fd76569958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pieces: []
+  blackKing: {fileID: 0}
+  whiteKing: {fileID: 0}
 --- !u!4 &1239211785
 Transform:
   m_ObjectHideFlags: 0
@@ -1671,6 +1674,7 @@ MonoBehaviour:
     rookPoint: {fileID: 1924035888182833136}
     queenPoint: {fileID: 308389462835367428}
     kingPoint: {fileID: 1475539919541574861}
+  choicePiece: {fileID: 0}
   curTeam: 2
 --- !u!4 &1340955702
 Transform:
@@ -2648,6 +2652,10 @@ PrefabInstance:
       propertyPath: team
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6742183534192485442, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
+      propertyPath: prefab
+      value: 
+      objectReference: {fileID: 262801558090305183, guid: 4c6faee201424294fa4c24997a16aa4f, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
 --- !u!4 &2085682180 stripped
@@ -3226,6 +3234,10 @@ PrefabInstance:
       propertyPath: team
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1074584045972478575, guid: 746edbe1e44a53d4ab4b633ea99bec41, type: 3}
+      propertyPath: prefab
+      value: 
+      objectReference: {fileID: 3715331878745233799, guid: 4c6faee201424294fa4c24997a16aa4f, type: 3}
     - target: {fileID: 2876362159902503024, guid: 746edbe1e44a53d4ab4b633ea99bec41, type: 3}
       propertyPath: m_RootOrder
       value: 2

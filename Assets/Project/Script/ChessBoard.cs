@@ -26,8 +26,11 @@ public class ChessBoard : MonoBehaviour
 
     public List<Piece> pieces = new List<Piece>(32);
 
-    public PieceStruct[,] board= new PieceStruct[8, 8];
 
+    public Piece blackKing;
+    public Piece whiteKing;
+
+    public PieceStruct[,] board = new PieceStruct[8, 8];
     public AttackTile[,] blackAttackTiles = new AttackTile[8, 8];
     public AttackTile[,] whiteAttackTiles = new AttackTile[8, 8];
 
@@ -35,21 +38,21 @@ public class ChessBoard : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-        for(int y = 0; y <blackAttackTiles. GetLength(0); y++)
+        for (int y = 0; y < blackAttackTiles.GetLength(0); y++)
         {
-            for(int x = 0; x < blackAttackTiles.GetLength(1); x++)
+            for (int x = 0; x < blackAttackTiles.GetLength(1); x++)
             {
                 AttackTile black = new AttackTile();
                 black.ables = new LinkedList<Piece>();
                 black.warnings = new LinkedList<Piece>();
-                blackAttackTiles[y,x] = black;
+                blackAttackTiles[y, x] = black;
                 AttackTile white = new AttackTile();
                 white.ables = new LinkedList<Piece>();
                 white.warnings = new LinkedList<Piece>();
                 whiteAttackTiles[y, x] = white;
             }
         }
-        
+
 
         for (int y = 0; y < board.GetLength(0); y++)
         {
@@ -59,12 +62,12 @@ public class ChessBoard : MonoBehaviour
             }
         }
     }
-    public static PieceStruct GetPieceStruct(Piece piece, Team team)
+    public static PieceStruct GetPieceStruct(Piece piece)
     {
         PieceStruct pieceStruct = new PieceStruct();
         pieceStruct.piece = piece;
-        pieceStruct.type = piece.data.type; 
-        pieceStruct.team = team;
+        pieceStruct.type = piece.data.type;
+        pieceStruct.team = piece.team;
         return pieceStruct;
     }
 
@@ -87,9 +90,12 @@ public class ChessBoard : MonoBehaviour
     public void PlacePiece(PieceStruct piece, BoardPos boardPos)
     {
         board[boardPos.y, boardPos.x] = piece;
+        board[boardPos.y, boardPos.x].type = piece.type;
+        board[boardPos.y, boardPos.x].team = piece.team;
     }
     public void UnPlacePiece(BoardPos boardPos)
     {
+        board[boardPos.y, boardPos.x].piece = null;
         board[boardPos.y, boardPos.x].type = PieceType.Null;
         board[boardPos.y, boardPos.x].team = Team.Null;
     }
@@ -114,7 +120,7 @@ public class ChessBoard : MonoBehaviour
 
     public void AddAbleTile(PieceStruct piece, BoardPos boardPos)
     {
-        if(piece.team == Team.Black)
+        if (piece.team == Team.Black)
         {
             blackAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
         }
@@ -123,6 +129,18 @@ public class ChessBoard : MonoBehaviour
             whiteAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
         }
     }
+    public void RemoveAbleTile(PieceStruct piece, BoardPos boardPos)
+    {
+        if (piece.team == Team.Black)
+        {
+            blackAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
+        }
+        else if (piece.team == Team.White)
+        {
+            whiteAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
+        }
+    }
+
     public void AddWarningTile(PieceStruct piece, BoardPos boardPos)
     {
         if (piece.team == Team.Black)
@@ -134,6 +152,18 @@ public class ChessBoard : MonoBehaviour
             whiteAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
         }
     }
+    public void RemoveWarningTile(PieceStruct piece, BoardPos boardPos)
+    {
+        if (piece.team == Team.Black)
+        {
+            blackAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
+        }
+        else if (piece.team == Team.White)
+        {
+            whiteAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
+        }
+    }
+
 
     public void InitAttackTile()
     {
@@ -147,8 +177,9 @@ public class ChessBoard : MonoBehaviour
                 whiteAttackTiles[y, x].warnings.Clear();
             }
         }
-        foreach(Piece piece in pieces)
+        foreach (Piece piece in pieces)
         {
+            piece.ClearAbleTiel();
             piece.AddAbleTile();
         }
     }

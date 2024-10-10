@@ -96,7 +96,6 @@ public class Queen : LongDistancePiece
             }
         }
 
-
         for (int i = 0; i < 8; i++)
         {
             movePos = curPos;

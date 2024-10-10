@@ -18,27 +18,46 @@ public class King : Piece
         dirs[7] = new Vector3(1, 0, -1);    // 우하
     }
 
-    private void Update()
+    protected override void Start()
     {
-        BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
-        if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].ables.Count > 0)
+        base.Start();
+
+        if (team == Team.Black)
         {
-            Debug.Log($"{piece.team}킹 체크!");
+            ChessBoard.Instance.blackKing = this;
         }
-        else if(ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].warnings.Count > 0)
+        else if (team == Team.White) 
         {
-            Debug.Log($"{piece.team}킹 체크 위험");
-        }
-        if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].ables.Count > 0)
-        {
-            Debug.Log($"{piece.team}킹 체크!");
-        }
-        else if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].warnings.Count > 0)
-        {
-            Debug.Log($"{piece.team}킹 체크 위험");
+            ChessBoard.Instance.whiteKing = this;
         }
     }
 
+
+    private void Update()
+    {
+        //BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
+        //if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].ables.Count > 0)
+        //{
+        //    Debug.Log($"{piece.team}킹 체크!");
+        //}
+        //else if(ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].warnings.Count > 0)
+        //{
+        //    Debug.Log($"{piece.team}킹 체크 위험");
+        //}
+        //if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].ables.Count > 0)
+        //{
+        //    Debug.Log($"{piece.team}킹 체크!");
+        //}
+        //else if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].warnings.Count > 0)
+        //{
+        //    Debug.Log($"{piece.team}킹 체크 위험");
+        //}
+    }
+
+    public override void CheckOnWarningTile()
+    {
+        CreateAbleTile();
+    }
 
 
     public override void AddAbleTile()

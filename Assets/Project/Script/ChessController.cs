@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ChessController : MonoBehaviour
 {
+
     [System.Serializable]
     public struct Point
     {
@@ -23,7 +24,7 @@ public class ChessController : MonoBehaviour
     }
     PiecePoint[] piecePoints;
 
-    Piece choicePiece;
+    public Piece choicePiece;
     PiecePoint choicePiecePoint;
 
     [SerializeField] Team curTeam = Team.White;
@@ -32,6 +33,7 @@ public class ChessController : MonoBehaviour
     int boardLayerMask;
     private void Awake()
     {
+
         pieceLayerMask = LayerMask.GetMask("Piece");
         boardLayerMask = LayerMask.GetMask("Board");
 
@@ -78,7 +80,7 @@ public class ChessController : MonoBehaviour
             if (choicePiece.team == curTeam)
             {
                 choicePiecePoint = piecePoints[(int)choicePiece.data.type];
-                choicePiece.CreateAbleTile();
+                choicePiece.CheckOnWarningTile();
 
                 movePieceRoutine = movePieceRoutine == null ? StartCoroutine(MovePieceRoutine()) : movePieceRoutine;
             }
@@ -114,28 +116,30 @@ public class ChessController : MonoBehaviour
                 // 기존 위치 제거
                 ChessBoard.Instance.UnPlacePiece(ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
                 choicePiece.RemoveAbleTile();
-                choicePiece.ClearAbleTiel();
                 // 새로운 위치 등록
                 choicePiece.transform.position = choicePiecePoint.piecePoint.transform.position;
-                PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece, choicePiece.team);
+                PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece);
                 ChessBoard.Instance.PlacePiece(piece, ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
                 choicePiece.isMove = true;
-
-                // 턴 넘기기
-                ChessBoard.Instance.InitAttackTile();
-
+                // 턴 넘기기         
                 if (choicePiece.team == Team.Black)
                     curTeam = Team.White;
                 else if (choicePiece.team == Team.White)
                     curTeam = Team.Black;
+
+                choicePiecePoint.piecePoint.SetActive(false);
+                choicePiece = null;
+                
+                ChessBoard.Instance.InitAttackTile();
             }
             else
             {
                 choicePiece.RemoveAbleTile();
+                choicePiecePoint.piecePoint.SetActive(false);
+                choicePiece = null;
             }
             
-            choicePiecePoint.piecePoint.SetActive(false);
-            choicePiece = null;
+
         }
     }
     Coroutine movePieceRoutine;
@@ -145,6 +149,7 @@ public class ChessController : MonoBehaviour
         choicePiecePoint.piecePoint.transform.position = choicePiece.transform.position;
         while (true)
         {
+            yield return Manager.Delay.ms05;
 #if UNITY_EDITOR
             Vector3 touchPos = Input.mousePosition;
 #else
@@ -170,8 +175,7 @@ public class ChessController : MonoBehaviour
                 }
                 choicePiecePoint.piecePoint.transform.position = intPos;
                 choicePiecePoint.piecePoint.transform.rotation = choicePiece.transform.rotation;
-            }
-            yield return Manager.Delay.ms05;
+            }           
         }
     }
 
