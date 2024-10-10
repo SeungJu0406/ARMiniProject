@@ -11,41 +11,33 @@ public class Bishop : Piece
         // 2. 갈 수 있는 4방향에 대해 체크    
         BoardPos movePos = curPos;
         // 좌상
-        while (true)
+        for (int i = 0; i < 4; i++)
         {
-            movePos.x -= 1;
-            movePos.y += 1;
-            // 3. 해당 위치가 체스판 위이고 null값일때만 통과
-            if (!ProcessAbleTile(movePos))
-                break;
-        }
-        // 우상
-        movePos = curPos;
-        while (true)
-        {
-            movePos.x += 1;
-            movePos.y += 1;
-            if (!ProcessAbleTile(movePos))
-                break;
-        }
-        // 좌하
-        movePos = curPos;
-        while (true)
-        {
-            movePos.x -= 1;
-            movePos.y -= 1;
-            if (!ProcessAbleTile(movePos))
-                break;
-        }
-        // 우하
-        movePos = curPos;
-        while (true)
-        {
-            movePos.x += 1;
-            movePos.y -= 1;
-            if (!ProcessAbleTile(movePos))
-                break;
+            movePos = curPos;
+            while (true)
+            {
+                switch (i)
+                {
+                    case 0:
+                        movePos.x -= 1;
+                        movePos.y += 1;
+                        break;
+                    case 1:
+                        movePos.x += 1;
+                        movePos.y += 1;
+                        break;
+                    case 2:
+                        movePos.x -= 1;
+                        movePos.y -= 1;
+                        break;
+                    case 3:
+                        movePos.x += 1;
+                        movePos.y -= 1;
+                        break;
+                }
+                if (!ProcessAbleTile(movePos))
+                    break;
+            }
         }
     }
-
 }

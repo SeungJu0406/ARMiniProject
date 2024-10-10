@@ -11,37 +11,30 @@ public class Rook : Piece
         BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position);
         // 2. 갈 수 있는 4방향에 대해 체크    
         BoardPos movePos = curPos;
-        // 상단
-        while (true)
+
+        for(int i= 0; i< 4; i++)
         {
-            movePos.y += 1;
-            // 3. 해당 위치가 체스판 위이고 null값일때만 통과
-            if (!ProcessAbleTile(movePos))
-                break;
-        }
-        // 하단
-        movePos = curPos;
-        while (true)
-        {
-            movePos.y -= 1;
-            if (!ProcessAbleTile(movePos))
-                break;
-        }
-        // 좌
-        movePos = curPos;
-        while (true)
-        {
-            movePos.x -= 1;
-            if (!ProcessAbleTile(movePos))
-                break;
-        }
-        // 우
-        movePos = curPos;
-        while (true)
-        {
-            movePos.x += 1;
-            if (!ProcessAbleTile(movePos))
-                break;
+            movePos = curPos;
+            while (true)
+            {
+                switch (i)
+                {
+                    case 0:
+                        movePos.y += 1;
+                        break;
+                    case 1:
+                        movePos.y -= 1;
+                        break;
+                    case 2:
+                        movePos.x -= 1;
+                        break;
+                    case 3:
+                        movePos.x += 1;
+                        break;
+                }
+                if (!ProcessAbleTile(movePos))
+                    break;
+            }        
         }
     }
 }

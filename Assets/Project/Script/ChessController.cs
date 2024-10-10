@@ -131,6 +131,7 @@ public class ChessController : MonoBehaviour
     IEnumerator MovePieceRoutine()
     {
         choicePiecePoint.piecePoint.SetActive(true);
+        choicePiecePoint.piecePoint.transform.position = choicePiece.transform.position;
         while (true)
         {
 #if UNITY_EDITOR
@@ -140,7 +141,7 @@ public class ChessController : MonoBehaviour
 #endif
             Ray ray = Camera.main.ScreenPointToRay(touchPos);
             Debug.DrawRay(ray.origin, ray.direction * 100f);
-            if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 10f, boardLayerMask))
+            if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 100f, boardLayerMask))
             {
                 Vector3 intPos = new Vector3((int)hit.point.x, (int)hit.point.y, (int)hit.point.z);
                 BoardPos boardPos = ChessBoard.Instance.TransWorldToTile(intPos);
