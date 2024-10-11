@@ -41,13 +41,13 @@ public abstract class Piece : MonoBehaviour
         if (!isCheckWarningAfter)           // 반복 연산을 막기 위해 bool 체크
         {
             BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position); // 현재 위치 캐싱
-            Piece king = team == Team.White ? ChessBoard.Instance.whiteKing : ChessBoard.Instance.blackKing;
-            AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles :  ChessBoard.Instance.blackAttackTiles;
+            Piece king = team == Team.White ? ChessBoard.Instance.whiteKing : ChessBoard.Instance.blackKing; // 킹 인스턴스 캐싱
+            AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles :  ChessBoard.Instance.blackAttackTiles; // 어택 타일 캐싱
 
-            if (team == Team.White && ChessBoard.Instance.whiteAttackTiles[curPos.y, curPos.x].warnings.Count > 0)                                     
+            if (attackTiles[curPos.y, curPos.x].warnings.Count > 0)                                     
             {
-                BoardPos kingPos = ChessBoard.Instance.TransWorldToTile(ChessBoard.Instance.whiteKing.transform.position); // 왕의 위치 캐싱            
-                foreach (Piece warningPiece in ChessBoard.Instance.whiteAttackTiles[curPos.y, curPos.x].warnings)                                      
+                BoardPos kingPos = ChessBoard.Instance.TransWorldToTile(king.transform.position); // 왕의 위치 캐싱            
+                foreach (Piece warningPiece in attackTiles[curPos.y, curPos.x].warnings)                                      
                 {
                     PieceStruct cachingWarningPiece = ChessBoard.GetPieceStruct(warningPiece);
                     cachingWarningPieces.Add(cachingWarningPiece); // 위험 기물 캐싱
@@ -63,7 +63,9 @@ public abstract class Piece : MonoBehaviour
                     {
                         warningPiece.piece.AddAbleTile();
                         // 연산 결과가 킹의 타일이 able이되면
-                        if (ChessBoard.Instance.whiteAttackTiles[kingPos.y, kingPos.x].ables.Count > 0)                                             
+                        attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles; // 연산 이후 다시 캐싱
+
+                        if (attackTiles[kingPos.y, kingPos.x].ables.Count > 0)                                             
                         {
                             // 해당 적의 위치와 movePos 가 같은 경우는 제외 (잡은 경우)
                             BoardPos warningPiecePos = ChessBoard.Instance.TransWorldToTile(warningPiece.piece.transform.position);
@@ -77,47 +79,7 @@ public abstract class Piece : MonoBehaviour
                         }
                     }
                     // ables 클리어
-                    ChessBoard.Instance.whiteAttackTiles[kingPos.y, kingPos.x].ables.Clear();
-                    ChessBoard.Instance.UnPlacePiece(movePos); // 임시 이동 위치 삭제
-                }
-                ChessBoard.Instance.PlacePiece(piece, curPos); // 현재 위치로 재 배치
-
-                cachingWarningPieces.Clear();
-            }
-            else if (team == Team.Black && ChessBoard.Instance.blackAttackTiles[curPos.y, curPos.x].warnings.Count > 0)
-            {
-                BoardPos kingPos = ChessBoard.Instance.TransWorldToTile(ChessBoard.Instance.blackKing.transform.position); // 왕의 위치 캐싱
-                foreach (Piece warningPiece in ChessBoard.Instance.blackAttackTiles[curPos.y, curPos.x].warnings)
-                {
-                    PieceStruct cachingWarningPiece = ChessBoard.GetPieceStruct(warningPiece);
-                    cachingWarningPieces.Add(cachingWarningPiece); // 위험 기물 캐싱
-                }
-                ChessBoard.Instance.UnPlacePiece(curPos); // 임시로 현재 위치 제거
-
-                for (int i = ablePos.Count - 1; i >= 0; i--)
-                {
-                    BoardPos movePos = ablePos[i];
-                    ChessBoard.Instance.PlacePiece(piece, movePos); // 임시로 이동한 위치에 배치
-
-                    foreach (PieceStruct warningPiece in cachingWarningPieces)
-                    {
-                        warningPiece.piece.AddAbleTile();
-                        // 연산 결과가 킹의 타일이 able이되면
-                        if (ChessBoard.Instance.blackAttackTiles[kingPos.y, kingPos.x].ables.Count > 0)
-                        {
-                            // 해당 적의 위치와 movePos 가 같은 경우는 제외 (잡은 경우)
-                            BoardPos warningPiecePos = ChessBoard.Instance.TransWorldToTile(warningPiece.piece.transform.position);
-                            if (warningPiecePos.x == movePos.x && warningPiecePos.y == movePos.y)
-                                continue;
-
-                            // 해당 타일 움직임 불가(리스트에서 제거)
-                            ablePos.RemoveAt(i);
-                            ableMoveBoard[movePos.y, movePos.x] = false;
-                            break;
-                        }
-                    }
-                    // ables 클리어
-                    ChessBoard.Instance.blackAttackTiles[kingPos.y, kingPos.x].ables.Clear();
+                    attackTiles[kingPos.y, kingPos.x].ables.Clear();
                     ChessBoard.Instance.UnPlacePiece(movePos); // 임시 이동 위치 삭제
                 }
                 ChessBoard.Instance.PlacePiece(piece, curPos); // 현재 위치로 재 배치
