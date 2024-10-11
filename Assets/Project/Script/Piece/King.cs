@@ -108,11 +108,37 @@ public class King : Piece
 
             if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
             {
+                ChessBoard.Instance.AddAbleTile(piece, movePos);
+
                 if (attackTiles[movePos.y, movePos.x].ables.Count == 0)
                 {
                     ProcessAbleTile(movePos);
                 }
             }
         }
+    }
+
+    protected override bool ProcessAbleTile(BoardPos movePos)
+    {
+        isCheckWarningAfter = false;
+
+        if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
+        {
+            if (otherPiece.type == PieceType.Null)
+            {
+                // 해당 위치를 AbleZone로 지정 후 리스트에 추가
+                ableMoveBoard[movePos.y, movePos.x] = true;
+                ablePos.Add(movePos);
+                return true;
+            }
+            else if (otherPiece.team != Team.Null && otherPiece.team != team)
+            {
+
+                // 다른 팀이면 AbleZone로 지정 후 리스트에 추가 후 bool 값 false
+                ableMoveBoard[movePos.y, movePos.x] = true;
+                ablePos.Add(movePos);
+            }
+        }
+        return false;
     }
 }

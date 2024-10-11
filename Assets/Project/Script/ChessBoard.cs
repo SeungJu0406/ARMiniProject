@@ -308,12 +308,16 @@ public class ChessBoard : MonoBehaviour
         // 본인 턴 일 때
         if (controller.curTeam == king.team)
         {
-            if (kingCheck != CheckType.None && canDefendPiece.Count == 0 ) // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고 체크 일때
+            if (kingCheck != CheckType.None )
             {
                 king.CheckOnWarningTile();
-                if (king.ablePos.Count == 0)
+                if (king.ablePos.Count == 0 && canDefendPiece.Count == 0)  // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고 체크 일때
                 {
                     Debug.Log($"{king.name} 체크메이트");
+                }
+                else
+                {
+                    Debug.Log($"{king.name} 체크");
                 }
             }
             else if (kingCheck == CheckType.None && CheckStaleMate(pieces)) // 체크는 아니지만 모든 기물이 움직일 수 없을 때

@@ -7,6 +7,10 @@ public class Pawn : Piece
     {
         // 1. 현재 위치를 보드 위치로 변환
         BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position);
+
+        warningPos.Add(curPos);
+        ChessBoard.Instance.AddWarningTile(piece, curPos); // 폰은 본인의 위치만 워닝포인트로 지정
+
         // 2. 갈 수 있는 방향에 대해 체크  
         // 2-1. 폰은 흑백에 따라 방향이 다르다
         if (team == Team.Black)
@@ -39,14 +43,16 @@ public class Pawn : Piece
                     movePos.y += (int)dirs[i].z;
                     // 3. 해당 위치가 체스판 위이고 null값일때만 통과
                     // 앞에 기물이 없을 때만 움직일 수 있다
-                    ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct piece);
-                    if (piece.type == PieceType.Null)
+                    if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
                     {
-                        if (!ProcessAbleTile(movePos))
-                            continue;
+                        if (otherPiece.type == PieceType.Null)
+                        {
+                            if (!ProcessAbleTile(movePos))
+                                continue;
+                        }
+                        else
+                            break;
                     }
-                    else
-                        break;
                 }
             }
             // 대각선 이동의 경우 해당 위치에 적이 있을 때만 움직일 수 있다
@@ -55,13 +61,39 @@ public class Pawn : Piece
                 movePos.x += (int)dirs[i].x;
                 movePos.y += (int)dirs[i].z;
 
-                ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct piece);
-                if (piece.team != Team.Null && piece.team != team)
+                if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
                 {
-                    if (!ProcessAbleTile(movePos))
-                        continue;
+                    ChessBoard.Instance.AddAbleTile(piece, movePos);
+                    if (otherPiece.team != Team.Null && otherPiece.team != team)
+                    {
+                        if (!ProcessAbleTile(movePos))
+                            continue;
+                    }
                 }
             }
         }
+    }
+    protected override bool ProcessAbleTile(BoardPos movePos)
+    {
+        isCheckWarningAfter = false;
+
+        if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
+        {
+            if (otherPiece.type == PieceType.Null)
+            {
+                // 해당 위치를 AbleZone로 지정 후 리스트에 추가
+                ableMoveBoard[movePos.y, movePos.x] = true;
+                ablePos.Add(movePos);
+                return true;
+            }
+            else if (otherPiece.team != Team.Null && otherPiece.team != team)
+            {
+
+                // 다른 팀이면 AbleZone로 지정 후 리스트에 추가 후 bool 값 false
+                ableMoveBoard[movePos.y, movePos.x] = true;
+                ablePos.Add(movePos);
+            }
+        }
+        return false;
     }
 }

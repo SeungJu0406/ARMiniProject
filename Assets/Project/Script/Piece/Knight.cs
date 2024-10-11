@@ -33,6 +33,9 @@ public class Knight : Piece
         // 1. 현재 위치를 보드 위치로 변환
         BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position);
 
+        warningPos.Add(curPos);
+        ChessBoard.Instance.AddWarningTile(piece, curPos); // 나이트는 본인의 위치만 워닝포인트로 지정
+
         // 2. 해당 보드 위치에서 갈 수 있는 8방향에 대해 체크       
         for (int i = 0; i < dirs.Length; i++)
         {

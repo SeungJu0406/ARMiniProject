@@ -147,6 +147,7 @@ public abstract class Piece : MonoBehaviour
         }
 
         ablePos.Clear();
+        warningPos.Clear();
     }
     public bool CheckAbleTile(BoardPos boardPos)
     {

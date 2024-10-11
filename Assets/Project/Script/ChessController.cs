@@ -42,8 +42,15 @@ public class ChessController : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(StartRoutine());
+    }
+    IEnumerator StartRoutine()
+    {
+        yield return Manager.Delay.ms05;
         ChessBoard.Instance.InitAttackTile();
     }
+
+
     private void Update()
     {
 #if UNITY_EDITOR
