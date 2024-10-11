@@ -64,7 +64,7 @@ public class King : Piece
             AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles;
 
             if (attackTiles[curPos.y, curPos.x].warnings.Count > 0)
-            {          
+            {
                 foreach (Piece warningPiece in attackTiles[curPos.y, curPos.x].warnings)
                 {
                     PieceStruct cachingWarningPiece = ChessBoard.GetPieceStruct(warningPiece);
@@ -79,6 +79,8 @@ public class King : Piece
 
                     foreach (PieceStruct warningPiece in cachingWarningPieces)
                     {
+                        BoardPos warningPiecePos = ChessBoard.Instance.TransWorldToTile(warningPiece.piece.transform.position);
+
                         warningPiece.piece.AddAbleTile();
 
                         attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles;
@@ -94,12 +96,12 @@ public class King : Piece
                     // ables 클리어
                     attackTiles[movePos.y, movePos.x].ables.Clear();
                     ChessBoard.Instance.UnPlacePiece(movePos); // 임시 이동 위치 삭제
+
                 }
                 ChessBoard.Instance.PlacePiece(piece, curPos); // 현재 위치로 재 배치
 
                 cachingWarningPieces.Clear();
             }
-
         }
 
         CreateAbleTile();

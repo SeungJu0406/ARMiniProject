@@ -1,4 +1,4 @@
-using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,8 +14,8 @@ public abstract class Piece : MonoBehaviour
 
     protected bool[,] ableMoveBoard = new bool[8, 8];
     protected List<GameObject> ableTiles = new List<GameObject>(8);
-    protected List<BoardPos> ablePos = new List<BoardPos>(8);
-    protected List<BoardPos> warningPos = new List<BoardPos>(8);
+    public List<BoardPos> ablePos = new List<BoardPos>(8);
+    public List<BoardPos> warningPos = new List<BoardPos>(8);
 
     protected List<PieceStruct> cachingWarningPieces = new List<PieceStruct>();
 
@@ -23,7 +23,8 @@ public abstract class Piece : MonoBehaviour
 
     protected virtual void Start()
     {
-        ChessBoard.Instance.pieces.Add(this);
+        List<Piece> pieces = team == Team.White ? ChessBoard.Instance.whitePieces : ChessBoard.Instance.blackPieces;
+        pieces.Add(this);
 
         BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
         piece = ChessBoard.GetPieceStruct(this);
@@ -34,7 +35,29 @@ public abstract class Piece : MonoBehaviour
 
     public virtual void CheckOnWarningTile()
     {
-        
+        Debug.Log($"{name} 선택");
+        CheckType kingCheck = team == Team.White ? ChessBoard.Instance.whiteKingCheck : ChessBoard.Instance.blackKingCheck;
+        Debug.Log($"{kingCheck}");
+        if (kingCheck == CheckType.Check)
+        {
+            Debug.Log($"{name}: 방어 체크중");
+            List<Piece> canDefendPiece = team == Team.White ? ChessBoard.Instance.canDefendWhitePiece : ChessBoard.Instance.canDefendBlackPiece;
+            // 본인이 방어 불가능 기물이면 모든 ableMoveBoard와 ablePos 삭제
+            if (canDefendPiece.Contains(this) == false) 
+            {
+                Debug.Log($"{name}: 방어 불가");
+                ClearAbleTile();
+            }
+
+        }
+        else if (kingCheck == CheckType.Double)
+        {
+            // 킹만 방어 가능 무조건 ableMoveBoard와 ablePos 삭제
+            ClearAbleTile();
+        }
+
+
+
         // 워닝 포인트 위의 기물을 이동 할 때
         // 각 이동 포인트에 대해서 워닝포인트를 지정한 기물들에 대해 재연산
         // 이동 결과가 able되면 해당 타일 삭제
@@ -42,12 +65,12 @@ public abstract class Piece : MonoBehaviour
         {
             BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position); // 현재 위치 캐싱
             Piece king = team == Team.White ? ChessBoard.Instance.whiteKing : ChessBoard.Instance.blackKing; // 킹 인스턴스 캐싱
-            AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles :  ChessBoard.Instance.blackAttackTiles; // 어택 타일 캐싱
+            AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles; // 어택 타일 캐싱
 
-            if (attackTiles[curPos.y, curPos.x].warnings.Count > 0)                                     
+            if (attackTiles[curPos.y, curPos.x].warnings.Count > 0)
             {
                 BoardPos kingPos = ChessBoard.Instance.TransWorldToTile(king.transform.position); // 왕의 위치 캐싱            
-                foreach (Piece warningPiece in attackTiles[curPos.y, curPos.x].warnings)                                      
+                foreach (Piece warningPiece in attackTiles[curPos.y, curPos.x].warnings)
                 {
                     PieceStruct cachingWarningPiece = ChessBoard.GetPieceStruct(warningPiece);
                     cachingWarningPieces.Add(cachingWarningPiece); // 위험 기물 캐싱
@@ -65,7 +88,7 @@ public abstract class Piece : MonoBehaviour
                         // 연산 결과가 킹의 타일이 able이되면
                         attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles; // 연산 이후 다시 캐싱
 
-                        if (attackTiles[kingPos.y, kingPos.x].ables.Count > 0)                                             
+                        if (attackTiles[kingPos.y, kingPos.x].ables.Count > 0)
                         {
                             // 해당 적의 위치와 movePos 가 같은 경우는 제외 (잡은 경우)
                             BoardPos warningPiecePos = ChessBoard.Instance.TransWorldToTile(warningPiece.piece.transform.position);
@@ -117,7 +140,7 @@ public abstract class Piece : MonoBehaviour
             {
                 ableMoveBoard[y, x] = false;
             }
-        }       
+        }
         ablePos.Clear();
     }
     public bool CheckAbleTile(BoardPos boardPos)
@@ -127,7 +150,8 @@ public abstract class Piece : MonoBehaviour
 
     public void Die()
     {
-        ChessBoard.Instance.pieces.Remove(this);
+        List<Piece> pieces = team == Team.White ? ChessBoard.Instance.whitePieces : ChessBoard.Instance.blackPieces;
+        pieces.Remove(this);
         Destroy(gameObject);
     }
 
@@ -152,6 +176,11 @@ public abstract class Piece : MonoBehaviour
                 ChessBoard.Instance.AddAbleTile(piece, movePos);
                 ableMoveBoard[movePos.y, movePos.x] = true;
                 ablePos.Add(movePos);
+            }
+            else if (otherPiece.team != Team.Null && otherPiece.team == team)
+            {
+                // 같은 팀이면 이동은 불가능하지만 공격은 가능
+                ChessBoard.Instance.AddAbleTile(piece, movePos);
             }
         }
         return false;

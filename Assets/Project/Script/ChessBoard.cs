@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.ComponentModel;
 using UnityEngine;
+using UnityEditor.Experimental.GraphView;
 
 
-public enum CheckType { None, Check, Double}
+public enum CheckType { None, Check, Double }
 
 public struct BoardPos
 {
@@ -26,7 +29,11 @@ public class ChessBoard : MonoBehaviour
 {
     public static ChessBoard Instance;
 
-    public List<Piece> pieces = new List<Piece>(30); // 킹 제외
+    public List<Piece> whitePieces = new List<Piece>(15); // 킹 제외
+    public List<Piece> canDefendWhitePiece = new List<Piece>(15);
+
+    public List<Piece> blackPieces = new List<Piece>(15); // 킹 제외
+    public List<Piece> canDefendBlackPiece = new List<Piece>(15);
 
 
     public Piece blackKing;
@@ -124,53 +131,31 @@ public class ChessBoard : MonoBehaviour
 
     public void AddAbleTile(PieceStruct piece, BoardPos boardPos)
     {
-        if (piece.team == Team.Black)
-        {
-            whiteAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
-        }
-        else if (piece.team == Team.White)
-        {
-            blackAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
-        }
+        AttackTile[,] attackTiles = piece.team == Team.White ? blackAttackTiles : whiteAttackTiles;
+        attackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
     }
     public void RemoveAbleTile(PieceStruct piece, BoardPos boardPos)
     {
-        if (piece.team == Team.Black)
-        {
-            whiteAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
-        }
-        else if (piece.team == Team.White)
-        {
-            blackAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
-        }
+        AttackTile[,] attackTiles = piece.team == Team.White ? blackAttackTiles : whiteAttackTiles;
+        attackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
     }
 
     public void AddWarningTile(PieceStruct piece, BoardPos boardPos)
     {
-        if (piece.team == Team.Black)
-        {
-            whiteAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
-        }
-        else if (piece.team == Team.White)
-        {
-            blackAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
-        }
+        AttackTile[,] attackTiles = piece.team == Team.White ? blackAttackTiles : whiteAttackTiles;
+        attackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
     }
     public void RemoveWarningTile(PieceStruct piece, BoardPos boardPos)
     {
-        if (piece.team == Team.Black)
-        {
-            whiteAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
-        }
-        else if (piece.team == Team.White)
-        {
-            blackAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
-        }
+        AttackTile[,] attackTiles = piece.team == Team.White ? blackAttackTiles : whiteAttackTiles;
+        attackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
     }
 
 
     public void InitAttackTile()
     {
+        canDefendWhitePiece.Clear();
+        canDefendBlackPiece.Clear();
         for (int y = 0; y < whiteAttackTiles.GetLength(0); y++)
         {
             for (int x = 0; x < whiteAttackTiles.GetLength(1); x++)
@@ -181,10 +166,15 @@ public class ChessBoard : MonoBehaviour
                 blackAttackTiles[y, x].warnings.Clear();
             }
         }
-        foreach (Piece piece in pieces)
+        foreach (Piece piece in whitePieces)
         {
             piece.ClearAbleTile();
-            piece.AddAbleTile();       
+            piece.AddAbleTile();
+        }
+        foreach (Piece piece in blackPieces)
+        {
+            piece.ClearAbleTile();
+            piece.AddAbleTile();
         }
         whiteKing.ClearAbleTile();
         blackKing.ClearAbleTile();
@@ -192,7 +182,6 @@ public class ChessBoard : MonoBehaviour
         whiteKing.AddAbleTile();
         // 킹이 체크 당했는지 체크
         CheckKingCheck();
-
     }
 
     void CheckKingCheck()
@@ -204,19 +193,53 @@ public class ChessBoard : MonoBehaviour
         {
             AttackTile[,] attackTiles = i == 0 ? whiteAttackTiles : blackAttackTiles;
             BoardPos kingPos = i == 0 ? whiteKingPos : blackKingPos;
-            CheckType kingCheck = i == 0 ? whiteKingCheck : blackKingCheck;
+            List<Piece> pieces = i == 0 ? whitePieces : blackPieces;
+            List<Piece> canDefendPiece = i == 0 ? canDefendWhitePiece : canDefendBlackPiece;
+
 
             if (attackTiles[kingPos.y, kingPos.x].ables.Count == 1)
             {
-                kingCheck = CheckType.Check;
+                if(i == 0)
+                    whiteKingCheck = CheckType.Check;
+                else 
+                    blackKingCheck = CheckType.Check;
+
+
+                Piece attackPiece = attackTiles[kingPos.y, kingPos.x].ables.First();
+                List<BoardPos> warningPosList = attackPiece.warningPos;
+                foreach (Piece piece in pieces) 
+                {
+                    foreach(BoardPos ablePos in piece.ablePos)
+                    {
+                        bool canDefend = false;
+                        foreach (BoardPos warningPos in warningPosList)
+                        {
+                            if(ablePos.y == warningPos.y && ablePos.x == warningPos.x)
+                            {
+                                Debug.Log($"{i} , {piece.name}");
+                                canDefendPiece.Add(piece);
+                                canDefend = true;
+                                break;
+                            }
+                        }
+                        if (canDefend) break;
+                    }
+                }
+
             }
             else if (attackTiles[kingPos.y, kingPos.x].ables.Count > 1)
             {
-                kingCheck = CheckType.Double;
+                if (i == 0)
+                    whiteKingCheck = CheckType.Double;
+                else
+                    blackKingCheck = CheckType.Double;
             }
             else
             {
-                kingCheck = CheckType.None;
+                if (i == 0)
+                    whiteKingCheck = CheckType.None;
+                else
+                    blackKingCheck = CheckType.None;
             }
         }
     }
