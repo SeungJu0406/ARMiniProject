@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 public enum CheckType { None, Check, Double }
@@ -27,6 +28,8 @@ public class ChessBoard : MonoBehaviour
 {
     public static ChessBoard Instance;
 
+    [SerializeField] ChessController controller;
+
     public List<Piece> whitePieces = new List<Piece>(15); // 킹 제외
     public List<Piece> canDefendWhitePiece = new List<Piece>(15);
 
@@ -42,6 +45,7 @@ public class ChessBoard : MonoBehaviour
     public PieceStruct[,] board = new PieceStruct[8, 8];
     public AttackTile[,] whiteAttackTiles = new AttackTile[8, 8];
     public AttackTile[,] blackAttackTiles = new AttackTile[8, 8];
+
 
     private void Awake()
     {
@@ -217,6 +221,7 @@ public class ChessBoard : MonoBehaviour
                 else
                     blackKingCheck = CheckType.Double;
 
+
                 CheckCheckmate();
             }
             else
@@ -296,25 +301,31 @@ public class ChessBoard : MonoBehaviour
 
     void CheckCheckmate()
     {
-        for (int i = 0; i < 2; i++)
-        {
-            List<Piece> pieces = i == 0 ? whitePieces : blackPieces;
-            List<Piece> canDefendPiece = i == 0 ? canDefendWhitePiece : canDefendBlackPiece;
-            Piece king = i == 0 ? whiteKing : blackKing;
-            CheckType kingCheck = i == 0 ? whiteKingCheck : blackKingCheck;
+        
+        Piece king = pieces == whitePieces ? whiteKing : blackKing;
+        CheckType kingCheck = pieces == whitePieces ? whiteKingCheck : blackKingCheck;
 
-            if (canDefendPiece.Count == 0 && king.ablePos.Count == 0) // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고
+        // 본인 턴 일 때
+        if (controller.curTeam == king.team)
+        {
+            if (kingCheck != CheckType.None && canDefendPiece.Count == 0 ) // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고 체크 일때
             {
-                if (kingCheck != CheckType.None) // 체크 상태 일때
+                king.CheckOnWarningTile();
+                if (king.ablePos.Count == 0)
                 {
                     Debug.Log($"{king.name} 체크메이트");
                 }
-                else if (CheckStaleMate(pieces))  // 스테일메이트 일때
+            }
+            else if (kingCheck == CheckType.None && CheckStaleMate(pieces)) // 체크는 아니지만 모든 기물이 움직일 수 없을 때
+            {
+                king.CheckOnWarningTile();
+                if (king.ablePos.Count == 0)
                 {
-                    Debug.Log($"{king.name} 스테일메이트");                 
+                    Debug.Log($"{king.name} 스테일메이트");
                 }
             }
         }
+
     }
 
     bool CheckStaleMate(List<Piece> pieces)
@@ -323,7 +334,6 @@ public class ChessBoard : MonoBehaviour
         {
             if (piece.ablePos.Count > 0)
             {
-                
                 return false;
             }
         }

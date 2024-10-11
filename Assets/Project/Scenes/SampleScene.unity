@@ -1537,6 +1537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98616aaa8200784bb18a2fd76569958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 1340955701}
   whitePieces: []
   canDefendWhitePiece: []
   blackPieces: []
@@ -1558,7 +1559,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1274798352
 GameObject:
@@ -1591,7 +1592,7 @@ Transform:
   - {fileID: 52432771}
   - {fileID: 907864504}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1311113424
 PrefabInstance:
@@ -1826,7 +1827,7 @@ Transform:
   - {fileID: 2472360999407552065}
   - {fileID: 7874949942961849985}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1566721630
 PrefabInstance:

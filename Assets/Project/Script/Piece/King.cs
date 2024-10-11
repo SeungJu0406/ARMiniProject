@@ -34,27 +34,6 @@ public class King : Piece
     }
 
 
-    private void Update()
-    {
-        //BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
-        //if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].ables.Count > 0)
-        //{
-        //    Debug.Log($"{piece.team}킹 체크!");
-        //}
-        //else if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].warnings.Count > 0)
-        //{
-        //    Debug.Log($"{piece.team}킹 체크 위험");
-        //}
-        //if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].ables.Count > 0)
-        //{
-        //    Debug.Log($"{piece.team}킹 체크!");
-        //}
-        //else if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].warnings.Count > 0)
-        //{
-        //    Debug.Log($"{piece.team}킹 체크 위험");
-        //}
-    }
-
     public override void CheckOnWarningTile()
     {
         BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position); // 현재 위치 캐싱
@@ -75,6 +54,7 @@ public class King : Piece
                 for (int i = ablePos.Count - 1; i >= 0; i--)
                 {
                     BoardPos movePos = ablePos[i];
+                    ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece); // 임시 이동 위치 기물 저장
                     ChessBoard.Instance.PlacePiece(piece, movePos); // 임시로 이동한 위치에 배치
 
                     foreach (PieceStruct warningPiece in cachingWarningPieces)
@@ -95,7 +75,7 @@ public class King : Piece
                     }
                     // ables 클리어
                     attackTiles[movePos.y, movePos.x].ables.Clear();
-                    ChessBoard.Instance.UnPlacePiece(movePos); // 임시 이동 위치 삭제
+                    ChessBoard.Instance.PlacePiece(otherPiece, movePos); // 임시 이동 위치 다시 복구
 
                 }
                 ChessBoard.Instance.PlacePiece(piece, curPos); // 현재 위치로 재 배치
@@ -103,8 +83,10 @@ public class King : Piece
                 cachingWarningPieces.Clear();
             }
         }
-
-        CreateAbleTile();
+        if (isClick)
+        {
+            CreateAbleTile();
+        }
     }
 
 

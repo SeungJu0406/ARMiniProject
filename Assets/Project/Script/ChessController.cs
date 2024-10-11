@@ -2,8 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 public class ChessController : MonoBehaviour
-{
-
+{ 
     [System.Serializable]
     public struct Point
     {
@@ -27,12 +26,13 @@ public class ChessController : MonoBehaviour
     public Piece choicePiece;
     PiecePoint choicePiecePoint;
 
-    [SerializeField] Team curTeam = Team.White;
+    [SerializeField] public Team curTeam = Team.White;
 
     int pieceLayerMask;
     int boardLayerMask;
     private void Awake()
     {
+
 
         pieceLayerMask = LayerMask.GetMask("Piece");
         boardLayerMask = LayerMask.GetMask("Board");
@@ -80,6 +80,7 @@ public class ChessController : MonoBehaviour
             if (choicePiece.team == curTeam)
             {
                 choicePiecePoint = piecePoints[(int)choicePiece.data.type];
+                choicePiece.isClick = true;
                 choicePiece.CheckOnWarningTile();
 
                 movePieceRoutine = movePieceRoutine == null ? StartCoroutine(MovePieceRoutine()) : movePieceRoutine;
@@ -101,6 +102,8 @@ public class ChessController : MonoBehaviour
 
         if (choicePiece != null)
         {
+            choicePiece.isClick = false;
+
             BoardPos pointPos = ChessBoard.Instance.TransWorldToTile(choicePiecePoint.piecePoint.transform.position);
             if (choicePiece.CheckAbleTile(pointPos))
             {
@@ -130,6 +133,8 @@ public class ChessController : MonoBehaviour
 
                 choicePiecePoint.piecePoint.SetActive(false);
                 choicePiece = null;
+
+                
 
                 ChessBoard.Instance.InitAttackTile();
             }

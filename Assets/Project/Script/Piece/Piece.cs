@@ -8,7 +8,7 @@ public abstract class Piece : MonoBehaviour
     [SerializeField] public Team team;
 
     public bool isMove;
-
+    public bool isClick;
     protected PieceStruct piece = new PieceStruct();
 
     public bool[,] ableMoveBoard = new bool[8, 8];
@@ -110,9 +110,13 @@ public abstract class Piece : MonoBehaviour
             }
         }
 
+        
         isCheckWarningAfter = true;
         // 해당 위치로 able 타일 생성
-        CreateAbleTile();
+        if (isClick)
+        {
+            CreateAbleTile();
+        }
     }
 
     public void CreateAbleTile()
@@ -156,7 +160,7 @@ public abstract class Piece : MonoBehaviour
         Destroy(gameObject);
     }
 
-    protected bool ProcessAbleTile(BoardPos movePos)
+    protected virtual bool ProcessAbleTile(BoardPos movePos)
     {
         isCheckWarningAfter = false;
 
