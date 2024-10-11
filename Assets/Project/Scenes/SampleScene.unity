@@ -244,6 +244,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: black_king
       objectReference: {fileID: 0}
+    - target: {fileID: 5556106810774329644, guid: dd3ce076770a2024ab25e5e3d07871ff, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5556106810774329644, guid: dd3ce076770a2024ab25e5e3d07871ff, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 6035841810706618475, guid: dd3ce076770a2024ab25e5e3d07871ff, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1304,15 +1312,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1047831027}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 320559078}
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1001 &1135322147
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3085,6 +3093,14 @@ PrefabInstance:
     - target: {fileID: 3319173084322187111, guid: a296a30de97789241ae4883a630d8a18, type: 3}
       propertyPath: m_Name
       value: WhiteKing
+      objectReference: {fileID: 0}
+    - target: {fileID: 3319173084322187111, guid: a296a30de97789241ae4883a630d8a18, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3319173084322187111, guid: a296a30de97789241ae4883a630d8a18, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 6278942395301731627, guid: a296a30de97789241ae4883a630d8a18, type: 3}
       propertyPath: m_RootOrder

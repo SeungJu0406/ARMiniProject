@@ -108,13 +108,31 @@ public class King : Piece
 
             if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
             {
-
-                ChessBoard.Instance.AddAbleTile(piece, movePos);
-
                 if (attackTiles[movePos.y, movePos.x].ables.Count == 0)
                 {
                     ProcessAbleTile(movePos);
                 }
+            }
+        }
+    }
+
+    public void AddAttackTile()
+    {
+        BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position);
+
+        // 2. 해당 보드 위치에서 갈 수 있는 8방향에 대해 체크       
+        for (int i = 0; i < dirs.Length; i++)
+        {
+            BoardPos movePos = curPos;
+            movePos.x += (int)dirs[i].x;
+            movePos.y += (int)dirs[i].z;
+
+            // 3. 해당 방향이 보드판에 없거나 null 값 타일이 아니면 이동이 불가능하다
+            // 추가로 킹은 해당 칸이 able칸이면 해당 칸 이동 불가
+            AttackTile[,] attackTiles = team == Team.Black ? ChessBoard.Instance.blackAttackTiles : ChessBoard.Instance.whiteAttackTiles;
+            if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
+            {
+                ChessBoard.Instance.AddAbleTile(piece, movePos);
             }
         }
     }

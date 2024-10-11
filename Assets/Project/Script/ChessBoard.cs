@@ -36,9 +36,9 @@ public class ChessBoard : MonoBehaviour
     public List<Piece> canDefendBlackPiece = new List<Piece>(15);
 
 
-    public Piece blackKing;
+    public King blackKing;
     public CheckType blackKingCheck;
-    public Piece whiteKing;
+    public King whiteKing;
     public CheckType whiteKingCheck;
 
     public PieceStruct[,] board = new PieceStruct[8, 8];
@@ -180,11 +180,8 @@ public class ChessBoard : MonoBehaviour
         // 킹 값 초기화
         whiteKing.ClearAbleTile();
         blackKing.ClearAbleTile();
-        blackKing.AddAbleTile();
+        blackKing.AddAttackTile();
         whiteKing.AddAbleTile();
-
-        // 화이트 킹에 대해서 블랙 킹 재 초기화
-        blackKing.ClearAbleTile();
         blackKing.AddAbleTile();
         // 킹이 체크 당했는지 체크
         CheckKingCheck();

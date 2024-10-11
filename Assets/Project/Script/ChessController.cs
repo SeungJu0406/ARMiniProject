@@ -142,8 +142,6 @@ public class ChessController : MonoBehaviour
                 choicePiece = null;              
 
                 ChessBoard.Instance.InitAttackTile();
-
-                ChessBoard.Instance.DebugAttackBoard(1);
             }
             else
             {
