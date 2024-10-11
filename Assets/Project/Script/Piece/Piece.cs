@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,13 +11,13 @@ public abstract class Piece : MonoBehaviour
 
     protected PieceStruct piece = new PieceStruct();
 
-    protected bool[,] ableMoveBoard = new bool[8, 8];
-    protected List<GameObject> ableTiles = new List<GameObject>(8);
+    public bool[,] ableMoveBoard = new bool[8, 8];
     public List<BoardPos> ablePos = new List<BoardPos>(8);
     public List<BoardPos> warningPos = new List<BoardPos>(8);
 
-    protected List<PieceStruct> cachingWarningPieces = new List<PieceStruct>();
+    protected List<GameObject> ableTiles = new List<GameObject>(8);
 
+    protected List<PieceStruct> cachingWarningPieces = new List<PieceStruct>();
     protected bool isCheckWarningAfter;
 
     protected virtual void Start()
@@ -35,17 +34,15 @@ public abstract class Piece : MonoBehaviour
 
     public virtual void CheckOnWarningTile()
     {
-        Debug.Log($"{name} 선택");
+        if (ablePos.Count == 0) return;
+
         CheckType kingCheck = team == Team.White ? ChessBoard.Instance.whiteKingCheck : ChessBoard.Instance.blackKingCheck;
-        Debug.Log($"{kingCheck}");
         if (kingCheck == CheckType.Check)
         {
-            Debug.Log($"{name}: 방어 체크중");
             List<Piece> canDefendPiece = team == Team.White ? ChessBoard.Instance.canDefendWhitePiece : ChessBoard.Instance.canDefendBlackPiece;
             // 본인이 방어 불가능 기물이면 모든 ableMoveBoard와 ablePos 삭제
-            if (canDefendPiece.Contains(this) == false) 
+            if (canDefendPiece.Contains(this) == false)
             {
-                Debug.Log($"{name}: 방어 불가");
                 ClearAbleTile();
             }
 
@@ -68,7 +65,7 @@ public abstract class Piece : MonoBehaviour
             AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles; // 어택 타일 캐싱
 
             if (attackTiles[curPos.y, curPos.x].warnings.Count > 0)
-            {
+            {   
                 BoardPos kingPos = ChessBoard.Instance.TransWorldToTile(king.transform.position); // 왕의 위치 캐싱            
                 foreach (Piece warningPiece in attackTiles[curPos.y, curPos.x].warnings)
                 {
@@ -80,6 +77,8 @@ public abstract class Piece : MonoBehaviour
                 for (int i = ablePos.Count - 1; i >= 0; i--)
                 {
                     BoardPos movePos = ablePos[i];
+
+                    ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece); // 임시로 이동할 위치의 기물 저장
                     ChessBoard.Instance.PlacePiece(piece, movePos); // 임시로 이동한 위치에 배치
 
                     foreach (PieceStruct warningPiece in cachingWarningPieces)
@@ -103,22 +102,23 @@ public abstract class Piece : MonoBehaviour
                     }
                     // ables 클리어
                     attackTiles[kingPos.y, kingPos.x].ables.Clear();
-                    ChessBoard.Instance.UnPlacePiece(movePos); // 임시 이동 위치 삭제
+                    ChessBoard.Instance.PlacePiece(otherPiece ,movePos); // 임시 위치 다시 복구
                 }
                 ChessBoard.Instance.PlacePiece(piece, curPos); // 현재 위치로 재 배치
 
                 cachingWarningPieces.Clear();
             }
         }
+
         isCheckWarningAfter = true;
         // 해당 위치로 able 타일 생성
         CreateAbleTile();
     }
 
     public void CreateAbleTile()
-    {
+    {     
         for (int i = 0; i < ablePos.Count; i++)
-        {
+        {       
             Vector3 pos = ChessBoard.Instance.TransTileToWorld(ablePos[i]);
             GameObject ableTile = AbleZonePool.Instance.GetPool(pos);
             ableTiles.Add(ableTile);
@@ -141,6 +141,7 @@ public abstract class Piece : MonoBehaviour
                 ableMoveBoard[y, x] = false;
             }
         }
+
         ablePos.Clear();
     }
     public bool CheckAbleTile(BoardPos boardPos)

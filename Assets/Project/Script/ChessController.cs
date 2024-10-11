@@ -117,6 +117,7 @@ public class ChessController : MonoBehaviour
                 ChessBoard.Instance.UnPlacePiece(ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
                 choicePiece.RemoveAbleTile();
                 // 새로운 위치 등록
+
                 choicePiece.transform.position = choicePiecePoint.piecePoint.transform.position;
                 PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece);
                 ChessBoard.Instance.PlacePiece(piece, ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
@@ -129,7 +130,7 @@ public class ChessController : MonoBehaviour
 
                 choicePiecePoint.piecePoint.SetActive(false);
                 choicePiece = null;
-                
+
                 ChessBoard.Instance.InitAttackTile();
             }
             else
@@ -138,8 +139,8 @@ public class ChessController : MonoBehaviour
                 choicePiecePoint.piecePoint.SetActive(false);
                 choicePiece = null;
             }
-            
 
+            
         }
     }
     Coroutine movePieceRoutine;

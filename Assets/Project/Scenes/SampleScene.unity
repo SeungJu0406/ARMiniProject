@@ -1032,6 +1032,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: black_bishop
       objectReference: {fileID: 0}
+    - target: {fileID: 5072021485914250399, guid: 94160cd8302c2094ca567d98c1692551, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5072021485914250399, guid: 94160cd8302c2094ca567d98c1692551, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 94160cd8302c2094ca567d98c1692551, type: 3}
 --- !u!4 &860822659 stripped
@@ -1205,6 +1213,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: black_bishop (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5072021485914250399, guid: 94160cd8302c2094ca567d98c1692551, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 94160cd8302c2094ca567d98c1692551, type: 3}
 --- !u!4 &984797082 stripped
@@ -1351,6 +1363,10 @@ PrefabInstance:
     - target: {fileID: 5773535338657831067, guid: 207417434d4e486469e63164bcf82c72, type: 3}
       propertyPath: m_Name
       value: black_knight
+      objectReference: {fileID: 0}
+    - target: {fileID: 5773535338657831067, guid: 207417434d4e486469e63164bcf82c72, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7298564154405099758, guid: 207417434d4e486469e63164bcf82c72, type: 3}
       propertyPath: team
@@ -1521,9 +1537,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98616aaa8200784bb18a2fd76569958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pieces: []
+  whitePieces: []
+  canDefendWhitePiece: []
+  blackPieces: []
+  canDefendBlackPiece: []
   blackKing: {fileID: 0}
+  blackKingCheck: 0
   whiteKing: {fileID: 0}
+  whiteKingCheck: 0
 --- !u!4 &1239211785
 Transform:
   m_ObjectHideFlags: 0
@@ -1586,6 +1607,14 @@ PrefabInstance:
     - target: {fileID: 3780438328246563921, guid: e33b1949558e47544a03594e855ca9f0, type: 3}
       propertyPath: m_Name
       value: black_queen
+      objectReference: {fileID: 0}
+    - target: {fileID: 3780438328246563921, guid: e33b1949558e47544a03594e855ca9f0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3780438328246563921, guid: e33b1949558e47544a03594e855ca9f0, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 4256221432094061863, guid: e33b1949558e47544a03594e855ca9f0, type: 3}
       propertyPath: m_RootOrder
@@ -1854,6 +1883,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: black_knight (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5773535338657831067, guid: 207417434d4e486469e63164bcf82c72, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7298564154405099758, guid: 207417434d4e486469e63164bcf82c72, type: 3}
       propertyPath: team
       value: 1
@@ -2002,6 +2035,10 @@ PrefabInstance:
     - target: {fileID: 1418577212984322221, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
       propertyPath: m_Name
       value: black_rook
+      objectReference: {fileID: 0}
+    - target: {fileID: 1418577212984322221, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2328756474093783372, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
       propertyPath: m_RootOrder
@@ -2603,6 +2640,10 @@ PrefabInstance:
     - target: {fileID: 1418577212984322221, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
       propertyPath: m_Name
       value: black_rook (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1418577212984322221, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2328756474093783372, guid: fe45f5fe2b9dbdf42b6044a23332ce9e, type: 3}
       propertyPath: m_RootOrder
@@ -3229,6 +3270,10 @@ PrefabInstance:
     - target: {fileID: 135932119572297781, guid: 746edbe1e44a53d4ab4b633ea99bec41, type: 3}
       propertyPath: m_Name
       value: WhiteQueen
+      objectReference: {fileID: 0}
+    - target: {fileID: 135932119572297781, guid: 746edbe1e44a53d4ab4b633ea99bec41, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 1074584045972478575, guid: 746edbe1e44a53d4ab4b633ea99bec41, type: 3}
       propertyPath: team

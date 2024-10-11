@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.ComponentModel;
 using UnityEngine;
-using UnityEditor.Experimental.GraphView;
 
 
 public enum CheckType { None, Check, Double }
@@ -184,6 +182,10 @@ public class ChessBoard : MonoBehaviour
         CheckKingCheck();
     }
 
+    AttackTile[,] attackTiles;
+    BoardPos kingPos;
+    List<Piece> pieces;
+    List<Piece> canDefendPiece;
     void CheckKingCheck()
     {
         BoardPos whiteKingPos = TransWorldToTile(whiteKing.transform.position);
@@ -191,40 +193,21 @@ public class ChessBoard : MonoBehaviour
 
         for (int i = 0; i < 2; i++)
         {
-            AttackTile[,] attackTiles = i == 0 ? whiteAttackTiles : blackAttackTiles;
-            BoardPos kingPos = i == 0 ? whiteKingPos : blackKingPos;
-            List<Piece> pieces = i == 0 ? whitePieces : blackPieces;
-            List<Piece> canDefendPiece = i == 0 ? canDefendWhitePiece : canDefendBlackPiece;
+            attackTiles = i == 0 ? whiteAttackTiles : blackAttackTiles;
+            kingPos = i == 0 ? whiteKingPos : blackKingPos;
+            pieces = i == 0 ? whitePieces : blackPieces;
+            canDefendPiece = i == 0 ? canDefendWhitePiece : canDefendBlackPiece;
 
 
             if (attackTiles[kingPos.y, kingPos.x].ables.Count == 1)
             {
-                if(i == 0)
+                if (i == 0)
                     whiteKingCheck = CheckType.Check;
-                else 
+                else
                     blackKingCheck = CheckType.Check;
 
-
-                Piece attackPiece = attackTiles[kingPos.y, kingPos.x].ables.First();
-                List<BoardPos> warningPosList = attackPiece.warningPos;
-                foreach (Piece piece in pieces) 
-                {
-                    foreach(BoardPos ablePos in piece.ablePos)
-                    {
-                        bool canDefend = false;
-                        foreach (BoardPos warningPos in warningPosList)
-                        {
-                            if(ablePos.y == warningPos.y && ablePos.x == warningPos.x)
-                            {
-                                Debug.Log($"{i} , {piece.name}");
-                                canDefendPiece.Add(piece);
-                                canDefend = true;
-                                break;
-                            }
-                        }
-                        if (canDefend) break;
-                    }
-                }
+                ProcessCheckCase();
+                CheckCheckmate();
 
             }
             else if (attackTiles[kingPos.y, kingPos.x].ables.Count > 1)
@@ -233,6 +216,8 @@ public class ChessBoard : MonoBehaviour
                     whiteKingCheck = CheckType.Double;
                 else
                     blackKingCheck = CheckType.Double;
+
+                CheckCheckmate();
             }
             else
             {
@@ -240,11 +225,110 @@ public class ChessBoard : MonoBehaviour
                     whiteKingCheck = CheckType.None;
                 else
                     blackKingCheck = CheckType.None;
+
+                CheckCheckmate();
             }
         }
     }
 
+    List<BoardPos> tempAblePos = new List<BoardPos>();
+    bool[,] tempAbleMoveBoard = new bool[8, 8];
+    void ProcessCheckCase()
+    {
+        Piece attackPiece = attackTiles[kingPos.y, kingPos.x].ables.First();
+        List<BoardPos> warningPosList = attackPiece.warningPos;
+        foreach (Piece piece in pieces)
+        {
+            for (int j = piece.ablePos.Count - 1; j >= 0; j--)
+            {
+                bool canDefend = false;
+                foreach (BoardPos warningPos in warningPosList)
+                {
+                    if (piece.ablePos[j].y == warningPos.y && piece.ablePos[j].x == warningPos.x)
+                    {
+                        if (!canDefend)
+                        {
+                            tempAbleMoveBoard[piece.ablePos[j].y, piece.ablePos[j].x] = true;
+                            BoardPos tempBoardPos = new BoardPos();
+                            tempBoardPos.y = piece.ablePos[j].y;
+                            tempBoardPos.x = piece.ablePos[j].x;
+                            tempAblePos.Add(tempBoardPos);
 
+                            canDefendPiece.Add(piece);
+                            canDefend = true;
+                        }
+                    }
+                }
+            }
+            SetTempToPieceAblePos(piece.ableMoveBoard, piece.ablePos);
+            ClearTemp();
+        }
+    }
+    #region Temp 변수 관리
+    void SetTempToPieceAblePos(bool[,] ableMoveBoard, List<BoardPos> ablePos)
+    {
+        for (int y = 0; y < ableMoveBoard.GetLength(0); y++)
+        {
+            for (int x = 0; x < ableMoveBoard.GetLength(1); x++)
+            {
+                ableMoveBoard[y, x] = tempAbleMoveBoard[y, x];
+            }
+        }
+        ablePos.Clear();
+        for (int i = 0; i < tempAblePos.Count; i++)
+        {
+            ablePos.Add(tempAblePos[i]);
+        }
+    }
+    void ClearTemp()
+    {
+        for (int y = 0; y < tempAbleMoveBoard.GetLength(0); y++)
+        {
+            for (int x = 0; x < tempAbleMoveBoard.GetLength(1); x++)
+            {
+                tempAbleMoveBoard[y, x] = false;
+            }
+        }
+
+        tempAblePos.Clear();
+    }
+    #endregion
+
+    void CheckCheckmate()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            List<Piece> pieces = i == 0 ? whitePieces : blackPieces;
+            List<Piece> canDefendPiece = i == 0 ? canDefendWhitePiece : canDefendBlackPiece;
+            Piece king = i == 0 ? whiteKing : blackKing;
+            CheckType kingCheck = i == 0 ? whiteKingCheck : blackKingCheck;
+
+            if (canDefendPiece.Count == 0 && king.ablePos.Count == 0) // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고
+            {
+                if (kingCheck != CheckType.None) // 체크 상태 일때
+                {
+                    Debug.Log($"{king.name} 체크메이트");
+                }
+                else if (CheckStaleMate(pieces))  // 스테일메이트 일때
+                {
+                    Debug.Log($"{king.name} 스테일메이트");                 
+                }
+            }
+        }
+    }
+
+    bool CheckStaleMate(List<Piece> pieces)
+    {
+        foreach (Piece piece in pieces) // 스테일메이트 조건 : 체크상태는 아니지만 모든 기물이 움직일 수 없을 때
+        {
+            if (piece.ablePos.Count > 0)
+            {
+                
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 
