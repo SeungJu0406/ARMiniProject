@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 
 public enum CheckType { None, Check, Double }
@@ -178,10 +177,15 @@ public class ChessBoard : MonoBehaviour
             piece.ClearAbleTile();
             piece.AddAbleTile();
         }
+        // 킹 값 초기화
         whiteKing.ClearAbleTile();
         blackKing.ClearAbleTile();
         blackKing.AddAbleTile();
         whiteKing.AddAbleTile();
+
+        // 화이트 킹에 대해서 블랙 킹 재 초기화
+        blackKing.ClearAbleTile();
+        blackKing.AddAbleTile();
         // 킹이 체크 당했는지 체크
         CheckKingCheck();
     }
@@ -301,14 +305,14 @@ public class ChessBoard : MonoBehaviour
 
     void CheckCheckmate()
     {
-        
+
         Piece king = pieces == whitePieces ? whiteKing : blackKing;
         CheckType kingCheck = pieces == whitePieces ? whiteKingCheck : blackKingCheck;
 
         // 본인 턴 일 때
         if (controller.curTeam == king.team)
         {
-            if (kingCheck != CheckType.None )
+            if (kingCheck != CheckType.None)
             {
                 king.CheckOnWarningTile();
                 if (king.ablePos.Count == 0 && canDefendPiece.Count == 0)  // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고 체크 일때
@@ -352,6 +356,16 @@ public class ChessBoard : MonoBehaviour
         for (int i = board.GetLength(0) - 1; i >= 0; i--)
         {
             Debug.Log($"[{board[i, 0].team}{board[i, 0].type}][{board[i, 1].team}{board[i, 1].type}][{board[i, 2].team}{board[i, 2].type}][{board[i, 3].team}{board[i, 3].type}][{board[i, 4].team}{board[i, 4].type}][{board[i, 5].team}{board[i, 5].type}][{board[i, 6].team}{board[i, 6].type}][{board[i, 7].team}{board[i, 7].type}]");
+        }
+    }
+
+    public void DebugAttackBoard(int n)
+    {
+        AttackTile[,] attackTiles = n == 0 ? whiteAttackTiles : blackAttackTiles;
+        
+        for(int i = attackTiles.GetLength(0) -1; i>= 0; i--)
+        {
+            Debug.Log($"[{attackTiles[i, 0].ables.Count}][{attackTiles[i, 1].ables.Count}][{attackTiles[i, 2].ables.Count}][{attackTiles[i, 3].ables.Count}][{attackTiles[i, 4].ables.Count}][{attackTiles[i, 5].ables.Count}][{attackTiles[i, 6].ables.Count}][{attackTiles[i, 7].ables.Count}]");
         }
     }
 }

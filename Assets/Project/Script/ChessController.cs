@@ -139,11 +139,11 @@ public class ChessController : MonoBehaviour
                     curTeam = Team.Black;
 
                 choicePiecePoint.piecePoint.SetActive(false);
-                choicePiece = null;
-
-                
+                choicePiece = null;              
 
                 ChessBoard.Instance.InitAttackTile();
+
+                ChessBoard.Instance.DebugAttackBoard(1);
             }
             else
             {

@@ -108,6 +108,7 @@ public class King : Piece
 
             if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
             {
+
                 ChessBoard.Instance.AddAbleTile(piece, movePos);
 
                 if (attackTiles[movePos.y, movePos.x].ables.Count == 0)
@@ -117,6 +118,8 @@ public class King : Piece
             }
         }
     }
+
+
 
     protected override bool ProcessAbleTile(BoardPos movePos)
     {
