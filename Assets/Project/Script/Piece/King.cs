@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class King : Piece
@@ -20,30 +18,25 @@ public class King : Piece
 
     protected override void Start()
     {
-        base.Start();
-
         if (team == Team.Black)
         {
             ChessBoard.Instance.blackKing = this;
         }
-        else if (team == Team.White) 
+        else if (team == Team.White)
         {
             ChessBoard.Instance.whiteKing = this;
         }
+
+
+        BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
+        piece = ChessBoard.GetPieceStruct(this);
+        ChessBoard.Instance.PlacePiece(piece, pos);
     }
 
 
     private void Update()
     {
         //BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
-        //if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].ables.Count > 0)
-        //{
-        //    Debug.Log($"{piece.team}킹 체크!");
-        //}
-        //else if(ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].warnings.Count > 0)
-        //{
-        //    Debug.Log($"{piece.team}킹 체크 위험");
-        //}
         //if (ChessBoard.Instance.blackAttackTiles[pos.y, pos.x].ables.Count > 0)
         //{
         //    Debug.Log($"{piece.team}킹 체크!");
@@ -52,10 +45,63 @@ public class King : Piece
         //{
         //    Debug.Log($"{piece.team}킹 체크 위험");
         //}
+        //if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].ables.Count > 0)
+        //{
+        //    Debug.Log($"{piece.team}킹 체크!");
+        //}
+        //else if (ChessBoard.Instance.whiteAttackTiles[pos.y, pos.x].warnings.Count > 0)
+        //{
+        //    Debug.Log($"{piece.team}킹 체크 위험");
+        //}
     }
 
     public override void CheckOnWarningTile()
     {
+        BoardPos curPos = ChessBoard.Instance.TransWorldToTile(transform.position); // 현재 위치 캐싱
+
+        if (!isCheckWarningAfter)           // 반복 연산을 막기 위해 bool 체크
+        {
+            AttackTile[,] attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles;
+
+            if (attackTiles[curPos.y, curPos.x].warnings.Count > 0)
+            {          
+                foreach (Piece warningPiece in attackTiles[curPos.y, curPos.x].warnings)
+                {
+                    PieceStruct cachingWarningPiece = ChessBoard.GetPieceStruct(warningPiece);
+                    cachingWarningPieces.Add(cachingWarningPiece); // 위험 기물 캐싱
+                }
+                ChessBoard.Instance.UnPlacePiece(curPos); // 임시로 현재 위치 제거
+
+                for (int i = ablePos.Count - 1; i >= 0; i--)
+                {
+                    BoardPos movePos = ablePos[i];
+                    ChessBoard.Instance.PlacePiece(piece, movePos); // 임시로 이동한 위치에 배치
+
+                    foreach (PieceStruct warningPiece in cachingWarningPieces)
+                    {
+                        warningPiece.piece.AddAbleTile();
+
+                        attackTiles = team == Team.White ? ChessBoard.Instance.whiteAttackTiles : ChessBoard.Instance.blackAttackTiles;
+                        // 연산 결과가 킹의 타일이 able이되면
+                        if (attackTiles[movePos.y, movePos.x].ables.Count > 0)
+                        {
+                            // 해당 타일 움직임 불가(리스트에서 제거)
+                            ablePos.RemoveAt(i);
+                            ableMoveBoard[movePos.y, movePos.x] = false;
+                            break;
+                        }
+                    }
+                    // ables 클리어
+                    attackTiles[movePos.y, movePos.x].ables.Clear();
+                    ChessBoard.Instance.UnPlacePiece(movePos); // 임시 이동 위치 삭제
+                }
+                ChessBoard.Instance.PlacePiece(piece, curPos); // 현재 위치로 재 배치
+
+                cachingWarningPieces.Clear();
+            }
+
+        }
+
         CreateAbleTile();
     }
 
@@ -73,7 +119,16 @@ public class King : Piece
             movePos.y += (int)dirs[i].z;
 
             // 3. 해당 방향이 보드판에 없거나 null 값 타일이 아니면 이동이 불가능하다
-            ProcessAbleTile(movePos);
+            // 추가로 킹은 해당 칸이 able칸이면 해당 칸 이동 불가
+            AttackTile[,] attackTiles = team == Team.Black ? ChessBoard.Instance.blackAttackTiles : ChessBoard.Instance.whiteAttackTiles;
+
+            if (ChessBoard.Instance.CheckTileOnBoard(movePos, out PieceStruct otherPiece))
+            {
+                if (attackTiles[movePos.y, movePos.x].ables.Count == 0)
+                {
+                    ProcessAbleTile(movePos);
+                }
+            }
         }
     }
 }

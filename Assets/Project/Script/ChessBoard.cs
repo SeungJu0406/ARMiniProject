@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+public enum CheckType { None, Check, Double}
+
 public struct BoardPos
 {
     public int y;
@@ -24,32 +26,34 @@ public class ChessBoard : MonoBehaviour
 {
     public static ChessBoard Instance;
 
-    public List<Piece> pieces = new List<Piece>(32);
+    public List<Piece> pieces = new List<Piece>(30); // 킹 제외
 
 
     public Piece blackKing;
+    public CheckType blackKingCheck;
     public Piece whiteKing;
+    public CheckType whiteKingCheck;
 
     public PieceStruct[,] board = new PieceStruct[8, 8];
-    public AttackTile[,] blackAttackTiles = new AttackTile[8, 8];
     public AttackTile[,] whiteAttackTiles = new AttackTile[8, 8];
+    public AttackTile[,] blackAttackTiles = new AttackTile[8, 8];
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-        for (int y = 0; y < blackAttackTiles.GetLength(0); y++)
+        for (int y = 0; y < whiteAttackTiles.GetLength(0); y++)
         {
-            for (int x = 0; x < blackAttackTiles.GetLength(1); x++)
+            for (int x = 0; x < whiteAttackTiles.GetLength(1); x++)
             {
                 AttackTile black = new AttackTile();
                 black.ables = new LinkedList<Piece>();
                 black.warnings = new LinkedList<Piece>();
-                blackAttackTiles[y, x] = black;
+                whiteAttackTiles[y, x] = black;
                 AttackTile white = new AttackTile();
                 white.ables = new LinkedList<Piece>();
                 white.warnings = new LinkedList<Piece>();
-                whiteAttackTiles[y, x] = white;
+                blackAttackTiles[y, x] = white;
             }
         }
 
@@ -122,22 +126,22 @@ public class ChessBoard : MonoBehaviour
     {
         if (piece.team == Team.Black)
         {
-            blackAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
+            whiteAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
         }
         else if (piece.team == Team.White)
         {
-            whiteAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
+            blackAttackTiles[boardPos.y, boardPos.x].ables.AddLast(piece.piece);
         }
     }
     public void RemoveAbleTile(PieceStruct piece, BoardPos boardPos)
     {
         if (piece.team == Team.Black)
         {
-            blackAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
+            whiteAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
         }
         else if (piece.team == Team.White)
         {
-            whiteAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
+            blackAttackTiles[boardPos.y, boardPos.x].ables.Remove(piece.piece);
         }
     }
 
@@ -145,44 +149,79 @@ public class ChessBoard : MonoBehaviour
     {
         if (piece.team == Team.Black)
         {
-            blackAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
+            whiteAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
         }
         else if (piece.team == Team.White)
         {
-            whiteAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
+            blackAttackTiles[boardPos.y, boardPos.x].warnings.AddLast(piece.piece);
         }
     }
     public void RemoveWarningTile(PieceStruct piece, BoardPos boardPos)
     {
         if (piece.team == Team.Black)
         {
-            blackAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
+            whiteAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
         }
         else if (piece.team == Team.White)
         {
-            whiteAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
+            blackAttackTiles[boardPos.y, boardPos.x].warnings.Remove(piece.piece);
         }
     }
 
 
     public void InitAttackTile()
     {
-        for (int y = 0; y < blackAttackTiles.GetLength(0); y++)
+        for (int y = 0; y < whiteAttackTiles.GetLength(0); y++)
         {
-            for (int x = 0; x < blackAttackTiles.GetLength(1); x++)
+            for (int x = 0; x < whiteAttackTiles.GetLength(1); x++)
             {
-                blackAttackTiles[y, x].ables.Clear();
-                blackAttackTiles[y, x].warnings.Clear();
                 whiteAttackTiles[y, x].ables.Clear();
                 whiteAttackTiles[y, x].warnings.Clear();
+                blackAttackTiles[y, x].ables.Clear();
+                blackAttackTiles[y, x].warnings.Clear();
             }
         }
         foreach (Piece piece in pieces)
         {
-            piece.ClearAbleTiel();
-            piece.AddAbleTile();
+            piece.ClearAbleTile();
+            piece.AddAbleTile();       
+        }
+        whiteKing.ClearAbleTile();
+        blackKing.ClearAbleTile();
+        blackKing.AddAbleTile();
+        whiteKing.AddAbleTile();
+        // 킹이 체크 당했는지 체크
+        CheckKingCheck();
+
+    }
+
+    void CheckKingCheck()
+    {
+        BoardPos whiteKingPos = TransWorldToTile(whiteKing.transform.position);
+        BoardPos blackKingPos = TransWorldToTile(blackKing.transform.position);
+
+        for (int i = 0; i < 2; i++)
+        {
+            AttackTile[,] attackTiles = i == 0 ? whiteAttackTiles : blackAttackTiles;
+            BoardPos kingPos = i == 0 ? whiteKingPos : blackKingPos;
+            CheckType kingCheck = i == 0 ? whiteKingCheck : blackKingCheck;
+
+            if (attackTiles[kingPos.y, kingPos.x].ables.Count == 1)
+            {
+                kingCheck = CheckType.Check;
+            }
+            else if (attackTiles[kingPos.y, kingPos.x].ables.Count > 1)
+            {
+                kingCheck = CheckType.Double;
+            }
+            else
+            {
+                kingCheck = CheckType.None;
+            }
         }
     }
+
+
 
 
 
