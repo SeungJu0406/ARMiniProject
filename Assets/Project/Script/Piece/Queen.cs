@@ -50,7 +50,9 @@ public class Queen : LongDistancePiece
                         break;
                 }
                 if (CheckAttackKing(movePos, out otherPiece))
+                {
                     break;
+                }                                       
             }
             if (otherPiece.type == PieceType.King)
             {

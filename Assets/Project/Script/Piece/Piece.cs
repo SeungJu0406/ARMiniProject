@@ -9,7 +9,7 @@ public abstract class Piece : MonoBehaviour
 
     public bool isMove;
     public bool isClick;
-    protected PieceStruct piece = new PieceStruct();
+    public PieceStruct piece = new PieceStruct();
 
     public bool[,] ableMoveBoard = new bool[8, 8];
     public List<BoardPos> ablePos = new List<BoardPos>(8);
@@ -22,12 +22,18 @@ public abstract class Piece : MonoBehaviour
 
     protected virtual void Start()
     {
+        Init();
+    }
+    public void Init()
+    {
         List<Piece> pieces = team == Team.White ? ChessBoard.Instance.whitePieces : ChessBoard.Instance.blackPieces;
-        pieces.Add(this);
-
-        BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
-        piece = ChessBoard.GetPieceStruct(this);
-        ChessBoard.Instance.PlacePiece(piece, pos);
+        if (pieces.Contains(this) == false)
+        {
+            pieces.Add(this);
+            BoardPos pos = ChessBoard.Instance.TransWorldToTile(transform.position);
+            piece = ChessBoard.GetPieceStruct(this);
+            ChessBoard.Instance.PlacePiece(piece, pos);
+        }
     }
 
     public abstract void AddAbleTile();
@@ -118,6 +124,10 @@ public abstract class Piece : MonoBehaviour
             CreateAbleTile();
         }
     }
+
+    public virtual void OccurEventOnTile(BoardPos boardPos) { }
+
+
 
     public void CreateAbleTile()
     {     
