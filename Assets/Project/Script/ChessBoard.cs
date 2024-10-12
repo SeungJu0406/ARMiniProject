@@ -104,6 +104,8 @@ public class ChessBoard : MonoBehaviour
         board[boardPos.y, boardPos.x] = piece;
         board[boardPos.y, boardPos.x].type = piece.type;
         board[boardPos.y, boardPos.x].team = piece.team;
+
+        piece.piece?.OccurEventOnTile(boardPos);
     }
     public void UnPlacePiece(BoardPos boardPos)
     {

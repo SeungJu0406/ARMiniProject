@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Pawn : Piece
@@ -95,5 +96,28 @@ public class Pawn : Piece
             }
         }
         return false;
+    }
+
+    public override void OccurEventOnTile(BoardPos boardPos)
+    {
+        int posY = team == Team.White ? 0 : 7;
+        if (boardPos.y == posY)
+        {
+            Promotion();
+        }
+    }
+    void Promotion()
+    {
+        // 프로모션할 기물 선택
+
+        // ... 로직
+
+        // 본인 위치에 생성할 피스 생성
+        Piece promotionPrefab = team == Team.White ? ChessController.Instance.typeStruct.whiteQueen : ChessController.Instance.typeStruct.blackQueen;
+
+        Piece promotionPiece= Instantiate(promotionPrefab, transform.position, transform.rotation);
+        promotionPiece.Init();
+        // 본인 제거 (Die로 제거)
+        Die();
     }
 }

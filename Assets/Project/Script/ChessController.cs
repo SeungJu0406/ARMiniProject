@@ -1,8 +1,33 @@
 using System.Collections;
 using UnityEngine;
 
+[System.Serializable]
+public struct TypeStruct
+{
+    [Header("White")]
+    public Pawn whitePawn;
+    public Knight whiteKnight;
+    public Bishop whiteBishop;
+    public Rook whiteRook;
+    public Queen whiteQueen;
+    public King whiteKing;
+    [Header("Black")]
+    public Pawn blackPawn;
+    public Knight blackKnight;
+    public Bishop blackBishop;
+    public Rook blackRook;
+    public Queen blackQueen;
+    public King blackKing;
+}
+
+
 public class ChessController : MonoBehaviour
-{ 
+{
+    public static ChessController Instance;
+
+
+    public TypeStruct typeStruct;
+
     [System.Serializable]
     public struct Point
     {
@@ -32,7 +57,8 @@ public class ChessController : MonoBehaviour
     int boardLayerMask;
     private void Awake()
     {
-
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
 
         pieceLayerMask = LayerMask.GetMask("Piece");
         boardLayerMask = LayerMask.GetMask("Board");
@@ -139,7 +165,7 @@ public class ChessController : MonoBehaviour
                     curTeam = Team.Black;
 
                 choicePiecePoint.piecePoint.SetActive(false);
-                choicePiece = null;              
+                choicePiece = null;
 
                 ChessBoard.Instance.InitAttackTile();
             }

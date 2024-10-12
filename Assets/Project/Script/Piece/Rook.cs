@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Rook : LongDistancePiece
@@ -31,10 +29,10 @@ public class Rook : LongDistancePiece
                         movePos.x += 1;
                         break;
                 }
-                if (CheckAttackKing(movePos,out otherPiece))
+                if (CheckAttackKing(movePos, out otherPiece))
                     break;
             }
-            if(otherPiece.type == PieceType.King)
+            if (otherPiece.type == PieceType.King)
             {
                 while (true)
                 {
@@ -62,7 +60,7 @@ public class Rook : LongDistancePiece
         }
 
 
-        for (int i= 0; i< 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             movePos = curPos;
             while (true)
@@ -84,7 +82,7 @@ public class Rook : LongDistancePiece
                 }
                 if (!ProcessAbleTile(movePos))
                     break;
-            }        
+            }
         }
     }
 }
