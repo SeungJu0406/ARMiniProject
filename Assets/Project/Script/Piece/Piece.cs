@@ -125,7 +125,10 @@ public abstract class Piece : MonoBehaviour
         }
     }
 
-    public virtual void OccurEventOnTile(BoardPos boardPos) { }
+    public virtual void OccurEventOnTile(BoardPos boardPos) 
+    {
+        ChessController.Instance.isTurnEnd = true;
+    }
 
 
 

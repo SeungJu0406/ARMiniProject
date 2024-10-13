@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Pawn : Piece
@@ -20,7 +20,7 @@ public class Pawn : Piece
             dirs[1] = new Vector3(-1, 0, 1);
             dirs[2] = new Vector3(1, 0, 1);
         }
-        else if(team == Team.White)
+        else if (team == Team.White)
         {
             dirs[0] = new Vector3(0, 0, -1);
             dirs[1] = new Vector3(-1, 0, -1);
@@ -106,18 +106,74 @@ public class Pawn : Piece
             Promotion();
         }
     }
+    PromotionUI promotionUI;
+    Piece promotionPiece;
+    bool isPromotionChoise;
     void Promotion()
     {
-        // 프로모션할 기물 선택
+        // 프로모션 UI 생성
+        StartCoroutine(PromotionRoutine());
+    }
 
-        // ... 로직
+    Coroutine promotionRoutine;
 
-        // 본인 위치에 생성할 피스 생성
-        Piece promotionPrefab = team == Team.White ? ChessController.Instance.typeStruct.whiteQueen : ChessController.Instance.typeStruct.blackQueen;
-
-        Piece promotionPiece= Instantiate(promotionPrefab, transform.position, transform.rotation);
-        promotionPiece.Init();
+    IEnumerator PromotionRoutine()
+    {
+        isPromotionChoise = false;
+        EnablePromotionUI();
+        ChessController.Instance.isTurnEnd = false;
+        while (isPromotionChoise == false)
+        {
+            yield return null;
+        }
+        Piece promotionInstance = Instantiate(promotionPiece, transform.position, transform.rotation);
+        promotionInstance.Init();
         // 본인 제거 (Die로 제거)
         Die();
+        DisAblePromotionUI();
+        ChessController.Instance.isTurnEnd = true;
+    }
+
+    void EnablePromotionUI()
+    {
+        promotionUI = ChessController.Instance.promotionUI;
+        promotionUI.UI.SetActive(true);
+        promotionUI.UI.transform.position = new Vector3(transform.position.x + 0.5f, 1f, transform.position.z + 0.5f);
+        promotionUI.UI.transform.rotation = transform.rotation;
+
+        promotionUI.queen.onClick.AddListener(PromotionQueen);
+        promotionUI.rook.onClick.AddListener(PromotionRook);
+        promotionUI.bishop.onClick.AddListener(PromotionBishop);
+        promotionUI.knight.onClick.AddListener(PromotionKnight);
+    }
+    void DisAblePromotionUI()
+    {
+        promotionUI.UI.SetActive(false);
+
+        promotionUI.queen.onClick.RemoveListener(PromotionQueen);
+        promotionUI.rook.onClick.RemoveListener(PromotionRook);
+        promotionUI.bishop.onClick.RemoveListener(PromotionBishop);
+        promotionUI.knight.onClick.RemoveListener(PromotionKnight);
+    }
+
+    public void PromotionQueen()
+    {
+        promotionPiece = team == Team.White ? ChessController.Instance.typeStruct.whiteQueen : ChessController.Instance.typeStruct.blackQueen;
+        isPromotionChoise = true;
+    }
+    public void PromotionRook()
+    {
+        promotionPiece = team == Team.White ? ChessController.Instance.typeStruct.whiteRook : ChessController.Instance.typeStruct.blackRook;
+        isPromotionChoise = true;
+    }
+    public void PromotionBishop()
+    {
+        promotionPiece = team == Team.White ? ChessController.Instance.typeStruct.whiteBishop : ChessController.Instance.typeStruct.blackBishop;
+        isPromotionChoise = true;
+    }
+    public void PromotionKnight()
+    {
+        promotionPiece = team == Team.White ? ChessController.Instance.typeStruct.whiteKnight : ChessController.Instance.typeStruct.blackKnight;
+        isPromotionChoise = true;
     }
 }
