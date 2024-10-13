@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public struct TypeStruct
@@ -19,7 +20,15 @@ public struct TypeStruct
     public Queen blackQueen;
     public King blackKing;
 }
-
+[System.Serializable]
+public struct PromotionUI
+{
+    public GameObject UI;
+    public Button queen;
+    public Button rook;
+    public Button bishop;
+    public Button knight;
+}
 
 public class ChessController : MonoBehaviour
 {
@@ -46,15 +55,23 @@ public class ChessController : MonoBehaviour
         public GameObject piecePoint;
         public Material pointMaterial;
     }
-    PiecePoint[] piecePoints;
 
+    [SerializeField] public PromotionUI promotionUI;
+
+    PiecePoint[] piecePoints;
+    
     public Piece choicePiece;
-    PiecePoint choicePiecePoint;
+    PiecePoint choicePiecePoint;   
 
     [SerializeField] public Team curTeam = Team.White;
 
+    public bool isTurnEnd;
+    bool canClick = true;
+
     int pieceLayerMask;
     int boardLayerMask;
+
+    
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -63,6 +80,7 @@ public class ChessController : MonoBehaviour
         pieceLayerMask = LayerMask.GetMask("Piece");
         boardLayerMask = LayerMask.GetMask("Board");
 
+        promotionUI.UI.SetActive(false);
         InitPoint();
     }
 
@@ -101,6 +119,8 @@ public class ChessController : MonoBehaviour
 
     void ChoosePiece()
     {
+        if (canClick == false) return;
+
 #if UNITY_EDITOR
         Vector3 touchPos = Input.mousePosition;
 #else
@@ -140,43 +160,15 @@ public class ChessController : MonoBehaviour
             BoardPos pointPos = ChessBoard.Instance.TransWorldToTile(choicePiecePoint.piecePoint.transform.position);
             if (choicePiece.CheckAbleTile(pointPos))
             {
-                // 해당 위치에 상대 기물이 있다면 상대 기물을 제거
-                if (ChessBoard.Instance.CheckTileOnBoard(pointPos, out PieceStruct enemyPiece))
-                {
-                    if (enemyPiece.team != Team.Null && enemyPiece.team != choicePiece.team)
-                    {
-                        enemyPiece.piece.Die();
-                    }
-                }
-
-                // 기존 위치 제거
-                ChessBoard.Instance.UnPlacePiece(ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
-                choicePiece.RemoveAbleTile();
-                // 새로운 위치 등록
-
-                choicePiece.transform.position = choicePiecePoint.piecePoint.transform.position;
-                PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece);
-                ChessBoard.Instance.PlacePiece(piece, ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
-                choicePiece.isMove = true;
-                // 턴 넘기기         
-                if (choicePiece.team == Team.Black)
-                    curTeam = Team.White;
-                else if (choicePiece.team == Team.White)
-                    curTeam = Team.Black;
-
-                choicePiecePoint.piecePoint.SetActive(false);
-                choicePiece = null;
-
-                ChessBoard.Instance.InitAttackTile();
+                ReplacePiece(pointPos);           
+                StartCoroutine(TurnEndRoutine());
             }
             else
             {
                 choicePiece.RemoveAbleTile();
                 choicePiecePoint.piecePoint.SetActive(false);
                 choicePiece = null;
-            }
-
-            
+            }         
         }
     }
     Coroutine movePieceRoutine;
@@ -238,5 +230,50 @@ public class ChessController : MonoBehaviour
         piecePoints[(int)type] = new PiecePoint();
         piecePoints[(int)type].piecePoint = point;
         piecePoints[(int)type].pointMaterial = piecePoints[(int)type].piecePoint.GetComponentInChildren<MeshRenderer>().material;
+    }
+
+    void ReplacePiece(BoardPos pointPos)
+    {
+        // 해당 위치에 상대 기물이 있다면 상대 기물을 제거
+        if (ChessBoard.Instance.CheckTileOnBoard(pointPos, out PieceStruct enemyPiece))
+        {
+            if (enemyPiece.team != Team.Null && enemyPiece.team != choicePiece.team)
+            {
+                enemyPiece.piece.Die();
+            }
+        }
+
+        // 기존 위치 제거
+        ChessBoard.Instance.UnPlacePiece(ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
+        choicePiece.RemoveAbleTile();
+        // 새로운 위치 등록
+
+        choicePiece.transform.position = choicePiecePoint.piecePoint.transform.position;
+        PieceStruct piece = ChessBoard.GetPieceStruct(choicePiece);
+        ChessBoard.Instance.PlacePiece(piece, ChessBoard.Instance.TransWorldToTile(choicePiece.transform.position));
+        choicePiece.isMove = true;
+        // 턴 넘기기
+        if (choicePiece.team == Team.Black)
+            curTeam = Team.White;
+        else if (choicePiece.team == Team.White)
+            curTeam = Team.Black;
+
+        choicePiecePoint.piecePoint.SetActive(false);
+        choicePiece = null;
+    }
+
+    Coroutine turnEndRoutine;
+
+    IEnumerator TurnEndRoutine()
+    {
+        canClick = false;
+        while (isTurnEnd == false)
+        {
+            Debug.Log("턴 종료 대기");
+            yield return null;
+        }
+        ChessBoard.Instance.InitAttackTile();
+        isTurnEnd = false;
+        canClick = true;
     }
 }
