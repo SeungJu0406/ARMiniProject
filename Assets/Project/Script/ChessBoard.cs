@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 
@@ -45,7 +46,9 @@ public class ChessBoard : MonoBehaviour
     public AttackTile[,] whiteAttackTiles = new AttackTile[8, 8];
     public AttackTile[,] blackAttackTiles = new AttackTile[8, 8];
 
-
+    [Space(10)]
+    [SerializeField] GameObject checkTile;
+    StringBuilder sb;
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -73,6 +76,10 @@ public class ChessBoard : MonoBehaviour
                 board[y, x].type = PieceType.Null;
             }
         }
+    }
+    private void Start()
+    {
+        sb = Manager.UI.sb;
     }
     public static PieceStruct GetPieceStruct(Piece piece)
     {
@@ -313,14 +320,11 @@ public class ChessBoard : MonoBehaviour
         {
             if (kingCheck != CheckType.None)
             {
+                ShowCheckTile(king);
                 king.CheckOnWarningTile();
                 if (king.ablePos.Count == 0 && canDefendPiece.Count == 0)  // 방어 할 수 있는 기물이 없으면서 , 왕이 움직일 수 없고 체크 일때
                 {
-                    Debug.Log($"{king.name} 체크메이트");
-                }
-                else
-                {
-                    Debug.Log($"{king.name} 체크");
+                    CheckMateGameOver();
                 }
             }
             else if (kingCheck == CheckType.None && CheckStaleMate(pieces)) // 체크는 아니지만 모든 기물이 움직일 수 없을 때
@@ -328,8 +332,12 @@ public class ChessBoard : MonoBehaviour
                 king.CheckOnWarningTile();
                 if (king.ablePos.Count == 0)
                 {
-                    Debug.Log($"{king.name} 스테일메이트");
+                    StaleMateGameOver();
                 }
+            }
+            else
+            {
+                HideCheckTile();
             }
         }
 
@@ -346,6 +354,36 @@ public class ChessBoard : MonoBehaviour
         }
         return true;
     }
+
+    void ShowCheckTile(Piece king)
+    {
+        checkTile.SetActive(true);
+        checkTile.transform.position = king.transform.position;
+    }
+    void HideCheckTile()
+    {
+        checkTile.SetActive(false);
+    }
+
+    void CheckMateGameOver()
+    {
+        ChessController.Instance.canClick = false;
+        Manager.UI.ShowGameOverUI();
+        sb.Clear();
+        sb = ChessController.Instance.curTeam == Team.White ? sb.Append($"Black Win") : sb.Append($"White Win");
+        Manager.UI.UpdateGameOverText(sb);
+    }
+    void StaleMateGameOver()
+    {
+        ChessController.Instance.canClick = false;
+        Manager.UI.ShowGameOverUI();
+        sb.Clear();
+        sb.Append("StaleMate Draw");
+        Manager.UI.UpdateGameOverText(sb);
+    }
+
+
+
 
 
 
