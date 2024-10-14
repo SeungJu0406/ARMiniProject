@@ -5,4 +5,5 @@ using UnityEngine;
 public static class Manager 
 {
     public static DelayManager Delay { get { return DelayManager.Instance; } }
+    public static UIManager UI {  get { return UIManager.Instance; } } 
 }

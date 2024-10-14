@@ -66,7 +66,7 @@ public class ChessController : MonoBehaviour
     [SerializeField] public Team curTeam = Team.White;
 
     public bool isTurnEnd;
-    bool canClick = true;
+    public bool canClick = true;
 
     int pieceLayerMask;
     int boardLayerMask;
@@ -269,7 +269,6 @@ public class ChessController : MonoBehaviour
         canClick = false;
         while (isTurnEnd == false)
         {
-            Debug.Log("턴 종료 대기");
             yield return null;
         }
         ChessBoard.Instance.InitAttackTile();
