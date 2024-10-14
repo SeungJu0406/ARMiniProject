@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     }
     public GameOverUI gameOverUI;
 
+    public GameObject miniMapUI;
 
     public StringBuilder sb = new StringBuilder();
     private void Awake()
@@ -37,12 +38,24 @@ public class UIManager : MonoBehaviour
         gameOverUI.box.SetActive(false);
     }
     public void UpdateGameOverText(StringBuilder sb)
-    { 
+    {
         gameOverUI.text.SetText(sb);
     }
 
     public void PressGameOverButton(string sceneName)
     {
         SceneManager.LoadSceneAsync(sceneName);
+    }
+
+    public void TriggerMiniMap()
+    {
+        if (miniMapUI.activeSelf)
+        {
+            miniMapUI.SetActive(false);
+        }
+        else
+        {
+            miniMapUI.SetActive(true);
+        }
     }
 }

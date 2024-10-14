@@ -65,7 +65,7 @@ public class ChessController : MonoBehaviour
 
     [SerializeField] public Team curTeam = Team.White;
 
-    public bool isTurnEnd;
+    public bool isTurnEnd = true;
     public bool canClick = true;
 
     int pieceLayerMask;
@@ -272,7 +272,6 @@ public class ChessController : MonoBehaviour
             yield return null;
         }
         ChessBoard.Instance.InitAttackTile();
-        isTurnEnd = false;
         canClick = true;
     }
 }

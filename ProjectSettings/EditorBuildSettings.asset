@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Project/Scenes/ChessScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
     path: Assets/Project/Scenes/LobbyScene.unity
     guid: 577dac60aaadf594d935a16b03aa3f52
+  - enabled: 1
+    path: Assets/Project/Scenes/ChessScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 7849f0992b5f2cb45af0753e3da83abe, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9d13c05bb39d8344089430c2a40a5116, type: 2}
