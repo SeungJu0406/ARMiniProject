@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -38,5 +39,10 @@ public class UIManager : MonoBehaviour
     public void UpdateGameOverText(StringBuilder sb)
     { 
         gameOverUI.text.SetText(sb);
+    }
+
+    public void PressGameOverButton(string sceneName)
+    {
+        SceneManager.LoadSceneAsync(sceneName);
     }
 }
