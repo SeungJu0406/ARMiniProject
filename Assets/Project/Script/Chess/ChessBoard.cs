@@ -93,16 +93,16 @@ public class ChessBoard : MonoBehaviour
     public BoardPos TransWorldToTile(Vector3 pos)
     {
         BoardPos boardPos = new BoardPos();
-        boardPos.y = (int)pos.z + 4;
-        boardPos.x = (int)pos.x + 4;
+        boardPos.y = (int)pos.z;
+        boardPos.x = (int)pos.x;
         return boardPos;
     }
 
     public Vector3 TransTileToWorld(BoardPos boardPos)
     {
         Vector3 pos = new Vector3();
-        pos.x = (int)boardPos.x - 4;
-        pos.z = (int)boardPos.y - 4;
+        pos.x = (int)boardPos.x;
+        pos.z = (int)boardPos.y;
         return pos;
     }
 

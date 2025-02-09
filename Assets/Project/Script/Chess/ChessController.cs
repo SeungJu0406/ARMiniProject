@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
 
 [System.Serializable]
 public struct TypeStruct
@@ -127,7 +128,7 @@ public class ChessController : MonoBehaviour
         Vector3 touchPos = Input.touches[0].position;
 #endif
         Ray ray = Camera.main.ScreenPointToRay(touchPos);
-        if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 10f, pieceLayerMask))
+        if (Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 100f, pieceLayerMask))
         {
             choicePiece = hit.collider.GetComponent<Piece>();
             if (choicePiece.team == curTeam)
@@ -169,7 +170,7 @@ public class ChessController : MonoBehaviour
                 choicePiecePoint.piecePoint.SetActive(false);
                 choicePiece = null;
             }         
-        }
+        }   
     }
     Coroutine movePieceRoutine;
     IEnumerator MovePieceRoutine()
@@ -230,6 +231,7 @@ public class ChessController : MonoBehaviour
         piecePoints[(int)type] = new PiecePoint();
         piecePoints[(int)type].piecePoint = point;
         piecePoints[(int)type].pointMaterial = piecePoints[(int)type].piecePoint.GetComponentInChildren<MeshRenderer>().material;
+        
     }
 
     void ReplacePiece(BoardPos pointPos)
